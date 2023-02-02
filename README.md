@@ -1,1 +1,1 @@
-# Materials-Acceleration-Platforms-autonomous-experimentation
+# Materials Acceleration Platforms: autonomous experimentation
