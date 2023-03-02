@@ -23,7 +23,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'shuttles = shuttles.shuttle:main'
+            'shuttle = orchestrator.shuttles:main'
+            #'manipulator = orchestrator.manipulator:main'
+            #'task_planner = orchestrator.task_planner:main'
         ],
     },
 )
