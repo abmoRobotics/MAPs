@@ -15,31 +15,37 @@ def generate_launch_description():
 
     # Decalre arguments
     gui_launch_arg = DeclareLaunchArgument(
-        'gui1',
+        'gui',
+        description="If you want a GUI with statistiscs and feedback",
         default_value='False'
     )
 
     isaac_sim_launch_arg = DeclareLaunchArgument(
         'isaac_sim',
+        description="If you want the simuleated environment therefore also no shuttles or manipulators",
         default_value='True'
     )
 
     shuttle_launch_arg = DeclareLaunchArgument(
         'sim_shuttles',
+        description="If you want the simulated environment with the shuttles",
         default_value='True'
     )
 
     manipulator_launch_arg = DeclareLaunchArgument(
         'sim_manipulator',
+        description="If you want the simulated environment with the manipulators",
         default_value='True'
     )
 
     physical_launch_arg = DeclareLaunchArgument(
         'use_physical_setup',
+        description="If you want a physical setup or not",
         default_value='False'
     )
     num_of_shuttle_launch_arg = DeclareLaunchArgument(
         'number_of_shuttles',
+        description="This will decalare the number of shuttles you want on the tabel",
         default_value="1"
     )
     shuttle_node = Node(
