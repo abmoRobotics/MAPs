@@ -3,7 +3,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
 
-def create_publisher_array(node: Node, n_robots: int, topic_name: str):
+def 
+create_publisher_array(node: Node, n_robots: int, topic_name: str):
     """
     Create a list of ROS publishers for a given number of robots.
 
