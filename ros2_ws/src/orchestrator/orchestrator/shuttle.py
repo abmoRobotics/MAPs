@@ -4,7 +4,7 @@ from rclpy.node import Node
 from utils.utils import create_joint_state_message_array, create_publisher_array
 
 
-class Manipulator(Node):
+class Shuttle(Node):
 
     def __init__(self):
         super().__init__('shuttle')
@@ -24,13 +24,14 @@ class Manipulator(Node):
             publisher.publish(self.msg_array[idx])
 
 def main(args=None):
+    """Initializes the Shuttle node and spins it until it is destroyed."""
     rclpy.init(args=args)
 
-    manipulator_node = Manipulator()
+    shuttle_node = Shuttle()
 
-    rclpy.spin(manipulator_node)
+    rclpy.spin(shuttle_node)
 
-    manipulator_node.destroy_node()
+    shuttle_node.destroy_node()
     rclpy.shutdown()
 
 
