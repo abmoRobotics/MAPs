@@ -1,10 +1,9 @@
-
 from rclpy.node import Node
+
 from sensor_msgs.msg import JointState
 
 
-
-def create_publisher_array(node: Node, n_robots: int):
+def create_publisher_array(node: Node, n_robots: int, topic_name: str):
     """
     Create a list of ROS publishers for a given number of robots.
 
@@ -19,8 +18,8 @@ def create_publisher_array(node: Node, n_robots: int):
     """
     publishers = []
     for i in range(n_robots):
-        node.get_logger().info('Publishing' + str(i))
-        publishers.append(node.create_publisher(JointState, '/shuttle'+str(i)+'/joint_command', 10))
+        node.get_logger().info('created topic: ' + node.get_name() + str(i) + topic_name)
+        publishers.append(node.create_publisher(JointState, node.get_name()+str(i)+topic_name, 10))
     return publishers
 
 def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointState:
@@ -37,9 +36,10 @@ def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointStat
     msgs = []
     msg = JointState()
     for i in range(n_msgs):
+        zero_array = [0.0] * len(joint_names)
         msg.name = joint_names
+        msg.position = zero_array
+        msg.velocity = zero_array
+        msg.effort = zero_array
         msgs.append(msg)
     return msgs
-    
-
-    #        msg.position = [1.0,2.0,3.0,4.0,5.0,6.0]
