@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from utils.utils import create_joint_state_message_array, create_publisher_array
+from utils import create_joint_state_message_array, create_publisher_array
 
 
 class Manipulator(Node):
