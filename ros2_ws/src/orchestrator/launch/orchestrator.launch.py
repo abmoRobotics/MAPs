@@ -15,7 +15,7 @@ def generate_launch_description():
 
     # Decalre arguments
     gui_launch_arg = DeclareLaunchArgument(
-        'gui',
+        'gui1',
         default_value='False'
     )
 
@@ -40,7 +40,7 @@ def generate_launch_description():
     )
     num_of_shuttle_launch_arg = DeclareLaunchArgument(
         'number_of_shuttles',
-        default_value="5"
+        default_value="1"
     )
     shuttle_node = Node(
         package='orchestrator',
