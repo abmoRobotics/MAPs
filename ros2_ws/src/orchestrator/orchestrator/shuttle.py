@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 import utils
+from utils import ShuttleMode
 
 class Shuttle(Node):
 
@@ -11,7 +12,7 @@ class Shuttle(Node):
         self.declare_parameter('num_of_shuttles')
         self.declare_parameter('sim_shuttle')
         number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
-        sim_shuttle = self.get_parameter('num_of_shuttles').get_parameter_value().bool_value
+        sim_shuttle = self.get_parameter('sim_shuttle').get_parameter_value().bool_value
 
         if sim_shuttle == False:
             number_of_shuttles = 0
