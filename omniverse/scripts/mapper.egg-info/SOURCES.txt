@@ -1,7 +1,0 @@
-README.md
-setup.py
-mapper.egg-info/PKG-INFO
-mapper.egg-info/SOURCES.txt
-mapper.egg-info/dependency_links.txt
-mapper.egg-info/not-zip-safe
-mapper.egg-info/top_level.txt
