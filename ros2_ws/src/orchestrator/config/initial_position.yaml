@@ -1,0 +1,7 @@
+gui:
+  ros__parameters:
+    shuttle1_position: [0.06, 0.1, 0.01]
+    shuttle2_position: [0.20, 0.1, 0.01]
+    shuttle3_position: [0.34, 0.1, 0.01]
+    shuttle4_position: [0.48, 0.1, 0.01]
+    shuttle5_position: [0.62, 0.1, 0.01] 

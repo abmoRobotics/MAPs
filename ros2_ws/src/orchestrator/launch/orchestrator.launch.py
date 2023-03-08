@@ -3,6 +3,8 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def generate_launch_description():
     # True / False arguments 
@@ -12,6 +14,12 @@ def generate_launch_description():
     manipulator = LaunchConfiguration('sim_manipulator')
     physical = LaunchConfiguration('use_physical_setup')
     no_shuttles = LaunchConfiguration('number_of_shuttles')
+
+    config = os.path.join(
+      get_package_share_directory('orchestrator'),
+      'config',
+      'initial_position.yaml'
+      )
 
     # Decalre arguments
     gui_launch_arg = DeclareLaunchArgument(
@@ -27,7 +35,7 @@ def generate_launch_description():
     )
 
     shuttle_launch_arg = DeclareLaunchArgument(
-        'sim_shuttles',
+        'sim_shuttle',
         description="If you want the simulated environment with the shuttles",
         default_value='True'
     )
@@ -53,22 +61,37 @@ def generate_launch_description():
         namespace='shuttle',
         executable='shuttle',
         name='shuttle',
+        output="screen",
+        emulate_tty=True,
         parameters=[
-            {"num_of_shuttles":no_shuttles}
+            {"num_of_shuttles":no_shuttles},
+            {"sim_shuttle":shuttle}
         ]
     )
     manipulator_node = Node(
         package='orchestrator',
-        namespace='shuttles1',
+        namespace='manipulator',
         executable='manipulator',
         name='sim'
     )
     task_planner_node = Node(
         package='orchestrator',
-        namespace='shuttles2',
+        namespace='task_planner',
         executable='task_planner',
         name='sim'
     )
+
+    gui_node = Node(
+        package='orchestrator',
+        executable='gui',
+        name='gui',
+        output="screen",
+        emulate_tty=True,
+        parameters=[config,
+                    {"num_of_shuttles":no_shuttles}]
+
+    )
+
 
     return LaunchDescription([
         gui_launch_arg,
@@ -77,6 +100,7 @@ def generate_launch_description():
         manipulator_launch_arg,
         physical_launch_arg,
         num_of_shuttle_launch_arg,
-        shuttle_node
+        shuttle_node,
+        gui_node
        
     ])

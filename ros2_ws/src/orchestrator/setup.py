@@ -13,7 +13,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name), glob('launch/*.launch.py'))
+        (os.path.join('share', package_name), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,7 +25,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'shuttle = orchestrator.shuttle:main'
+            'shuttle = orchestrator.shuttle:main',
+            'gui = orchestrator.gui:main'
             #'manipulator = orchestrator.manipulator:main'
             #'task_planner = orchestrator.task_planner:main'
         ],
