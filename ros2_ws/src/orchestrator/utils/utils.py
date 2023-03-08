@@ -3,9 +3,9 @@
 from rclpy.node import Node
 
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import Pose
 
-
-def create_publisher_array(node: Node, n_robots: int, topic_name: str):
+def create_publisher_array(node: Node, n_robots: int, topic_prefix: str, topic_name: str, msg_type: type):
     """
     Create a list of ROS publishers for a given number of robots.
 
@@ -20,12 +20,13 @@ def create_publisher_array(node: Node, n_robots: int, topic_name: str):
     """
     publishers = []
     for i in range(n_robots):
-        node.get_logger().info('created topic: ' + node.get_name() + str(i) + topic_name)
-        publishers.append(node.create_publisher(JointState, node.get_name()+str(i)+topic_name, 10))
+        node.get_logger().info('created topic: ' + topic_prefix + str(i) + topic_name)
+        node.get_logger().info('n_robots: ' + str(n_robots))
+        publishers.append(node.create_publisher(msg_type, topic_prefix+str(i)+topic_name, 10))
     return publishers
 
 def destroy_publisher_array(node: Node, publishers: int):
-    """
+    """s
     Create a list of ROS publishers for a given number of robots.
 
     :param node: The ROS Node object that will be used to create the publishers.

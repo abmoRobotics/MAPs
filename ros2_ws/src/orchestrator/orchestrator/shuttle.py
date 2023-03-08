@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array
 from utils import ShuttleMode
-
+from sensor_msgs.msg import JointState
 class Shuttle(Node):
 
     def __init__(self):
@@ -13,12 +13,13 @@ class Shuttle(Node):
         self.declare_parameter('sim_shuttle')
         self.number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
         sim_shuttle = self.get_parameter('sim_shuttle').get_parameter_value().bool_value
-
+        self.get_logger().info("number of shuttles" +  str(self.number_of_shuttles))
+        
         if sim_shuttle == False:
             self.number_of_shuttles = 0
         else:
             joint_names = ['x_translation', 'y_translation', 'z_translation', 'x_rotation', 'y_rotation', 'z_rotation']
-            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, '/joint_command')
+            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
             self.msg_array = create_joint_state_message_array(joint_names, self.number_of_shuttles)
 
         # Define callback timer
@@ -35,7 +36,7 @@ class Shuttle(Node):
         # Update the amout of topics that there need to be
         if self.number_of_shuttles > len(self.publisher_array) or self.number_of_shuttles < len(self.publisher_array):
             destroy_publisher_array(self, self.publisher_array)
-            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, '/joint_command')
+            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
             self.get_logger().info("Old shuttels destroyed")
 
         for idx, publisher in enumerate(self.publisher_array):

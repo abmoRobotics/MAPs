@@ -54,7 +54,7 @@ def generate_launch_description():
     num_of_shuttle_launch_arg = DeclareLaunchArgument(
         'number_of_shuttles',
         description="This will decalare the number of shuttles you want on the tabel",
-        default_value="1"
+        default_value="5"
     )
     shuttle_node = Node(
         package='orchestrator',
