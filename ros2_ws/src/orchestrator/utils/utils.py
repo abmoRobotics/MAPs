@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # utils.py
 from rclpy.node import Node
-
+import yaml
+import numpy as np
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 
@@ -64,3 +65,18 @@ def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointStat
         msg.effort = zero_array
         msgs.append(msg)
     return msgs
+
+
+
+def yaml_position_generate(node: Node, number_of_robots: int):
+    positions = {}
+    with open('src/orchestrator/config/initial_position.yaml', 'w') as yaml_file:
+        for i in range(number_of_robots):
+            positions['shuttle'+str(i+1)+'_position'] = []
+        node.get_logger().info(str(positions))
+        node_n = {str(node.get_name()): {'ros__parameters': positions}} 
+
+        yaml_out = yaml.dump(node_n, yaml_file, sort_keys=False) 
+        node.get_logger().info(str(yaml_out))
+ 
+        
