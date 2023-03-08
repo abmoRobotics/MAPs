@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: mapper
+Version: 1.0.0
+Summary: Environment for materials acceleration platforms
+Author: Anton Bjørndahl Mortensen
+Keywords: robotics,materials acceleration platforms
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.7, 3.8
