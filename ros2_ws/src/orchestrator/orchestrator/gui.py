@@ -14,12 +14,11 @@ class GUI(Node):
                                                          ('shuttle2_position', None),
                                                          ('shuttle3_position', None),
                                                          ('shuttle4_position', None),
-                                                         ('shuttle5_position', None),
-                                                         ('num_of_shuttles', None)])
+                                                         ('shuttle5_position', None)])
         
+        self.declare_parameter('num_of_shuttles')
         number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
-        self.get_logger().info(str(self.get_parameter('shuttle1_position').get_parameter_value().double_array_value))
-
+        
         en = self.get_parameter('shuttle1_position').get_parameter_value().double_array_value
         to = self.get_parameter('shuttle2_position').get_parameter_value().double_array_value
         tre = self.get_parameter('shuttle3_position').get_parameter_value().double_array_value
