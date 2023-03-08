@@ -4,6 +4,7 @@ from rclpy.node import Node
 from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array
 from utils import ShuttleMode
 from sensor_msgs.msg import JointState
+import random
 class Shuttle(Node):
 
     def __init__(self):
@@ -23,7 +24,7 @@ class Shuttle(Node):
             self.msg_array = create_joint_state_message_array(joint_names, self.number_of_shuttles)
 
         # Define callback timer
-        timer_period = 0.5  # seconds
+        timer_period = 2  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         
         self.mode = ShuttleMode()
@@ -40,9 +41,9 @@ class Shuttle(Node):
             self.get_logger().info("Old shuttels destroyed")
 
         for idx, publisher in enumerate(self.publisher_array):
-            pos = [(0.15)*(idx)+0.1, -1.0, 0.0, 0.0, 0.0, 0.0]
-            vel = [(0.15)*(idx)+0.1, 2.0, 0.0, 0.0, 0.0, 0.0]
-            msg = self.mode.move(pos,vel)
+            pos = [0.06 + random.random()*0.84, 0.06 + random.random()*0.60, 0.0, 0.0, 0.0, 0.0]
+            vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            msg = self.mode.move(pos, vel)
             publisher.publish(msg)
 
      
