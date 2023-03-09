@@ -74,7 +74,7 @@ class GUI(Node):
             response = call_list_parameters(node=self, node_name=node.full_name)
             response = sorted(response)
             parameter_values = self.get_parameter_values(self, node.full_name, response)
-            #yaml_output = {node.name: {'ros__parameters': {}}}
+            # yaml_output = {node.name: {'ros__parameters': {}}}
             yaml_output[node.name] = {'ros__parameters': {}}
             for param_name, pval in zip(response, parameter_values):
                 self.insert_dict(

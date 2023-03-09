@@ -5,6 +5,8 @@ import yaml
 import numpy as np
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def create_publisher_array(node: Node, n_robots: int, topic_prefix: str, topic_name: str, msg_type: type):
     """
@@ -66,6 +68,16 @@ def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointStat
         msgs.append(msg)
     return msgs
 
+def load_yaml_file(node_name: str) -> dict:
+    config_path = os.path.join(
+        get_package_share_directory('orchestrator'),
+        'config',
+        'config.yaml')
+    
+    with open(config_path, 'r') as f:
+        config = yaml.full_load(f)
+        config = config[node_name]["ros__parameters"]
+        return config   
 
 
 def yaml_position_generate(node: Node, number_of_robots: int):

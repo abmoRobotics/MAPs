@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
 
-from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array
+
+from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array, load_yaml_file
 from utils import ShuttleMode
 from sensor_msgs.msg import JointState
 import random
@@ -10,6 +11,21 @@ class Shuttle(Node):
     def __init__(self):
         super().__init__('shuttle')
         # Define publishers and messages
+        shuttle_config = load_yaml_file(self.get_name())
+        for key, value in shuttle_config.items():
+            if "position" in key:
+                self.declare_parameter(key)
+                param_value = rclpy.Parameter(
+                    key,
+                    rclpy.Parameter.Type.DOUBLE_ARRAY,
+                    value,
+                )
+                self.set_parameters([param_value])
+
+
+
+
+
         self.declare_parameter('num_of_shuttles')
         self.declare_parameter('sim_shuttle')
         self.number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
