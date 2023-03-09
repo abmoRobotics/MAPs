@@ -1,10 +1,12 @@
 from launch_ros.actions import Node
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
-from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, ExecuteProcess
+from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 import os
+from utils import save_yaml
+from launch.event_handlers import (OnExecutionComplete, OnProcessExit,
+                                OnProcessIO, OnProcessStart, OnShutdown)
 
 
 def generate_launch_description():
@@ -102,6 +104,13 @@ def generate_launch_description():
         physical_launch_arg,
         num_of_shuttle_launch_arg,
         shuttle_node,
-        gui_node
+        gui_node,
+
+        RegisterEventHandler(
+            OnShutdown(
+                on_shutdown=[ExecuteProcess(save_yaml(shuttle_node)
+                )]
+            )
+        ),
        
     ])
