@@ -3,10 +3,16 @@
 from rclpy.node import Node
 import yaml
 import numpy as np
+import os
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 from ament_index_python.packages import get_package_share_directory
 import os
+
+from ros2param.api import call_list_parameters, call_get_parameters, get_value
+from ros2node.api import get_absolute_node_name
+from rclpy.parameter import PARAMETER_SEPARATOR_STRING
+from ros2node.api import get_node_names
 
 def create_publisher_array(node: Node, n_robots: int, topic_prefix: str, topic_name: str, msg_type: type):
     """
@@ -91,4 +97,43 @@ def yaml_position_generate(node: Node, number_of_robots: int):
         yaml_out = yaml.dump(node_n, yaml_file, sort_keys=False) 
         node.get_logger().info(str(yaml_out))
  
-        
+def save_yaml(self):
+    node_names = get_node_names(node=self, include_hidden_nodes=False)
+
+    yaml_output = {}
+
+    for node in node_names:
+        print(node.full_name)
+        response = call_list_parameters(node=self, node_name=node.full_name)
+        response = sorted(response)
+        parameter_values = self.get_parameter_values(self, node.full_name, response)
+        #yaml_output = {node.name: {'ros__parameters': {}}}
+        yaml_output[node.name] = {'ros__parameters': {}}
+        for param_name, pval in zip(response, parameter_values):
+            self.insert_dict(
+                yaml_output[node.name]['ros__parameters'], param_name, pval)
+    
+    with open(os.path.join("", "tester3" + '.yaml'), 'w') as yaml_file:
+        yaml.dump(yaml_output, yaml_file, default_flow_style=False)
+
+def insert_dict(self, dictionary, key, value):
+    split = key.split(".", 1)
+    if len(split) > 1:
+        if not split[0] in dictionary:
+            dictionary[split[0]] = {}
+        self.insert_dict(dictionary[split[0]], split[1], value)
+    else:
+        dictionary[key] = value
+
+@staticmethod
+def get_parameter_values(node, node_name, params):
+    response = call_get_parameters(
+        node=node, node_name=node_name,
+        parameter_names=params)
+
+    # requested parameter not set
+    if not response.values:
+        return '# Parameter not set'
+
+    # extract type specific value
+    return [get_value(parameter_value=i) for i in response.values]       
