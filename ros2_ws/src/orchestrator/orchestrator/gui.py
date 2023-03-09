@@ -3,7 +3,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 
-from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array, yaml_position_generate
+from utils import create_joint_state_message_array, create_publisher_array, save_yaml, insert_dict, get_parameter_values
 from ros2param.api import call_list_parameters, call_get_parameters, get_value
 from ros2node.api import get_absolute_node_name
 from rclpy.parameter import PARAMETER_SEPARATOR_STRING
@@ -17,25 +17,11 @@ class GUI(Node):
 
     def __init__(self):
         super().__init__('gui')
-        self.declare_parameters(namespace='',parameters=[('shuttle1_position', None),
-                                                         ('shuttle2_position', None),
-                                                         ('shuttle3_position', None),
-                                                         ('shuttle4_position', None),
-                                                         ('shuttle5_position', None)])
-        
-        self.declare_parameter('num_of_shuttles')
-        number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
-        
-        en = self.get_parameter('shuttle1_position').get_parameter_value().double_array_value
-        to = self.get_parameter('shuttle2_position').get_parameter_value().double_array_value
-        tre = self.get_parameter('shuttle3_position').get_parameter_value().double_array_value
-        fire = self.get_parameter('shuttle4_position').get_parameter_value().double_array_value
-        fem = self.get_parameter('shuttle5_position').get_parameter_value().double_array_value
+
+
         
         self.msg = Pose()
-        param = [en, to, tre, fire, fem]
 
-        #yaml_position_generate(self, number_of_shuttles)
 
 
         # Define callback timer
