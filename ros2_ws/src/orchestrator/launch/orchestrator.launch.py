@@ -6,6 +6,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from ament_index_python.packages import get_package_share_directory
 import os
 
+
 def generate_launch_description():
     # True / False arguments 
     gui = LaunchConfiguration('gui')
