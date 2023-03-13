@@ -29,17 +29,17 @@ class GUI(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         joint_names = ['x_translation', 'y_translation', 'z_translation', 'x_rotation', 'y_rotation', 'z_rotation']
-        publisher_array= create_publisher_array(self, number_of_shuttles, topic_prefix="configuration/shuttle", topic_name='/initialPosition', msg_type=Pose)
-        self.msg_array = create_joint_state_message_array(joint_names, number_of_shuttles)
+        #publisher_array= create_publisher_array(self, number_of_shuttles, topic_prefix="configuration/shuttle", topic_name='/initialPosition', msg_type=Pose)
+        #self.msg_array = create_joint_state_message_array(joint_names, number_of_shuttles)
 
-        try:
-            for idx, publisher in enumerate(publisher_array):
-                self.msg.position.x = param[idx][0]
-                self.msg.position.y = param[idx][1]
-                self.msg.position.z = param[idx][2]
-                publisher.publish(self.msg)
-        except:
-            pass
+        # try:
+        #     for idx, publisher in enumerate(publisher_array):
+        #         self.msg.position.x = param[idx][0]
+        #         self.msg.position.y = param[idx][1]
+        #         self.msg.position.z = param[idx][2]
+        #         publisher.publish(self.msg)
+        # except:
+        #     pass
 
         #self.save_yaml()
 

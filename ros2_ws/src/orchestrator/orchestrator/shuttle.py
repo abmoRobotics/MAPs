@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 
-from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array, load_yaml_file
+from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array, load_yaml_file, save_yaml
 from utils import ShuttleMode
 from sensor_msgs.msg import JointState
 import random
@@ -12,6 +12,7 @@ class Shuttle(Node):
         super().__init__('shuttle')
         # Define publishers and messages
         shuttle_config = load_yaml_file(self.get_name())
+        print(shuttle_config)
         for key, value in shuttle_config.items():
             if "position" in key:
                 self.declare_parameter(key)
@@ -40,10 +41,11 @@ class Shuttle(Node):
             self.msg_array = create_joint_state_message_array(joint_names, self.number_of_shuttles)
 
         # Define callback timer
-        timer_period = 2  # seconds
+        timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         
         self.mode = ShuttleMode()
+        
 
     def timer_callback(self):
         try:
@@ -79,7 +81,8 @@ def main(args=None):
     shuttle_node = Shuttle()
 
     rclpy.spin(shuttle_node)
-
+    #print("NU")
+    #save_yaml(shuttle_node)
     shuttle_node.destroy_node()
     rclpy.shutdown()
 

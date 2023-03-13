@@ -97,35 +97,16 @@ def yaml_position_generate(node: Node, number_of_robots: int):
         yaml_out = yaml.dump(node_n, yaml_file, sort_keys=False) 
         node.get_logger().info(str(yaml_out))
  
-def save_yaml(self):
-    node_names = get_node_names(node=self, include_hidden_nodes=False)
 
-    yaml_output = {}
-
-    for node in node_names:
-        print(node.full_name)
-        response = call_list_parameters(node=self, node_name=node.full_name)
-        response = sorted(response)
-        parameter_values = self.get_parameter_values(self, node.full_name, response)
-        #yaml_output = {node.name: {'ros__parameters': {}}}
-        yaml_output[node.name] = {'ros__parameters': {}}
-        for param_name, pval in zip(response, parameter_values):
-            self.insert_dict(
-                yaml_output[node.name]['ros__parameters'], param_name, pval)
-    
-    with open(os.path.join("", "tester3" + '.yaml'), 'w') as yaml_file:
-        yaml.dump(yaml_output, yaml_file, default_flow_style=False)
-
-def insert_dict(self, dictionary, key, value):
+def insert_dict(dictionary, key, value):
     split = key.split(".", 1)
     if len(split) > 1:
         if not split[0] in dictionary:
             dictionary[split[0]] = {}
-        self.insert_dict(dictionary[split[0]], split[1], value)
+        insert_dict(dictionary[split[0]], split[1], value)
     else:
         dictionary[key] = value
 
-@staticmethod
 def get_parameter_values(node, node_name, params):
     response = call_get_parameters(
         node=node, node_name=node_name,
@@ -137,3 +118,30 @@ def get_parameter_values(node, node_name, params):
 
     # extract type specific value
     return [get_value(parameter_value=i) for i in response.values]       
+
+#TODO FIX
+def save_yaml(self):
+    node_names = get_node_names(node=self, include_hidden_nodes=False)
+
+    yaml_output = {}
+
+    for node in node_names:
+        print(node.full_name)
+        print("jeg sidder fast2")
+        response = call_list_parameters(node=self, node_name=node.full_name)
+        print("jeg sidder fast3")
+        response = sorted(response)
+        print("jeg sidder fast4")
+        parameter_values = get_parameter_values(self, node.full_name, response)
+        print("jeg sidder fast5")
+        #yaml_output = {node.name: {'ros__parameters': {}}}
+        yaml_output[node.name] = {'ros__parameters': {}}
+        for param_name, pval in zip(response, parameter_values):
+            print("jeg sidder fast")
+            insert_dict(
+                yaml_output[node.name]['ros__parameters'], param_name, pval)
+        print(yaml_output)
+    print("NU2")
+    print(yaml_output)
+    with open(os.path.join("", "tester3" + '.yaml'), 'w') as yaml_file:
+        yaml.dump(yaml_output, yaml_file, default_flow_style=False)

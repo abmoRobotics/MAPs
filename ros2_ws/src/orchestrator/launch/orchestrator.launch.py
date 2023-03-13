@@ -106,11 +106,11 @@ def generate_launch_description():
         shuttle_node,
         gui_node,
 
-        RegisterEventHandler(
-            OnShutdown(
-                on_shutdown=[ExecuteProcess(save_yaml(shuttle_node)
-                )]
-            )
-        ),
+        # RegisterEventHandler(
+        #     OnShutdown(
+        #         on_shutdown=[ExecuteProcess(save_yaml(shuttle_node)
+        #         )]
+        #     )
+        # ),
        
     ])
