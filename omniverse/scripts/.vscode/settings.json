@@ -1,0 +1,53 @@
+{
+    "files.associations": {
+        "*.kit": "toml",
+    },
+    "editor.rulers": [120],
+
+    "isaac_path": "~/.local/share/ov/pkg/isaac_sim-2022.2.0"
+    // Python modules search paths:
+    "python.analysis.extraPaths": [
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.kit.pip_archive/pip_prebundle",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/kernel/py",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/plugins/bindings-python",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.ui",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/exts/omni.graph.core",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.usd",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.kit.commands",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/exts/omni.hydra.pxr.settings",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/kit/exts/omni.kit.viewport.pxr",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/kit/extscore/omni.hydra.pxr",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/kit/extscore/omni.hydra.pxr",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.usd.libs",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/exts/omni.isaac.ros2_bridge",
+        "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/extscore/omni.usd.libs",
+        "~/1.P8/project/MAPs/omniverse/extensions/material-acceleration-platform/exts/abmoRobotics.maps",
+        "/opt/ros/foxy/lib/python3.8/site-packages/",
+
+
+    ],
+
+    // Python & Pylance Setup
+    "python.languageServer": "Pylance",
+    "python.pythonPath": "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/python/bin/python3",
+    "python.defaultInterpreterPath": "~/.local/share/ov/pkg/isaac_sim-2022.2.0/kit/python/bin/python3",
+
+    // We use "black" as a formatter:
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": ["--line-length", "120"],
+
+    "python.formatting.autopep8Path": "/usr/local/bin/autopep8",
+    "python.formatting.autopep8Args": [
+        "--max-line-length=120"
+    ],
+    "ros.distro": "foxy",
+    // // Use flake8 for linting
+    // "python.linting.enabled": true,
+    // "python.linting.pylintEnabled": false,
+    // "python.linting.flake8Enabled": true,
+    // "python.linting.flake8Args": ["--max-line-length=120"]
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Args": ["--ignore=E226,E302,E41,E501,W503,D107, D100, D102, D401,D101,Q000", "--max-line-length=100"],
+    //"python.formatting.provider": "autopep8"
+}

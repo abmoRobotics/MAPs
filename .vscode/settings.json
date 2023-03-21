@@ -1,0 +1,4 @@
+{
+    "ros.distro": "foxy",
+    "python.autoComplete.extraPaths": ["/opt/ros/foxy/lib/python3.8/site-packages"]
+}
