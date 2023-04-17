@@ -5,6 +5,7 @@
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="abmo19@student.aau.dk">anton</maintainer>
+  <maintainer email="mrma19@student.aau.dk">mads</maintainer>
   <license>TODO: License declaration</license>
 
   <test_depend>ament_copyright</test_depend>
