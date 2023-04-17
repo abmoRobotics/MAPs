@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-
+import numpy as np
 
 ip = "0.0.0.0"
 port = "5000"
@@ -34,6 +34,7 @@ way_point_graph = {
             "weights": [1, 1, 2, 1, 2, 1, 1, 1,  3, 2, 3, 2, 1, 2, 1, 3, 4, 2,  3,  1,  1]  # noqa
         }}}
 
+print(way_point_graph)
 matrix_response = requests.post(
     url + "set_cost_waypoint_graph", params=data_params, json=way_point_graph
 )
