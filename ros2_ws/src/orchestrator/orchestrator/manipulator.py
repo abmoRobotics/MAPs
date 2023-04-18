@@ -31,7 +31,7 @@ class Manipulator(Node):
         self.kuka600 = KR4R600()
         self.msg = JointState()
 
-        self.number_of_manipulators = 2
+        self.number_of_manipulators = 1
     
         joint_names = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']
         self.publisher_array = create_publisher_array(self, 
@@ -50,20 +50,23 @@ class Manipulator(Node):
         pose_test1 = SE3.Trans(0.6, -0.3, 0.1) * SE3.OA([0, 1, 0], [0, 0, -1])
         pose_test2 = SE3.Trans(0.6, -0.3, 0.1) * SE3.OA([0, 1, 0], [0, 0, -1])
 
-        sol1 = self.kuka540.ik_lm_chan(pose_test1)
+        #sol1 = self.kuka540.ik_lm_chan(pose_test1)
         sol2 = self.kuka600.ik_lm_chan(pose_test2)
+        sol3 = self.kuka600.ik_lm_chan(pose_test1)
 
-        self.qt1 = rtb.jtraj(self.kuka540.home, sol1, 50)
-        self.qt2 = rtb.jtraj(self.kuka600.home, sol2, 50)
+        self.qt1 = rtb.jtraj(self.kuka540.home, sol3[0], 50)
+        self.qt2 = rtb.jtraj(self.kuka600.home, sol2[0], 50)
+
+        self.pos2 = self.qt2.q.tolist()
 
     def timer_callback(self):
 
 
         for idx, publisher in enumerate(self.publisher_array):
-            
-            self.msg.position = self.qt1.q[0]
-            self.msg.position = self.qt2.q[0]
-            publisher.publish(self.msg)
+            for time, pos in enumerate(self.pos2):
+                self.msg.position = pos
+                publisher.publish(self.msg)
+
 
 def main(args=None):
     """Initializes the Manipulator node and spins it until it is destroyed."""
