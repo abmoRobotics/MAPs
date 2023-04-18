@@ -38,8 +38,7 @@ class KR3R540(DHRobot):
                 ],  name = "KR 3 R540",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
-                    symbolic=symbolic,
-                    meshdir="/home/rossen/Desktop/MAPs/ros2_ws/src/kuka_kr3_support/meshes/kr3r540/collision/"
+                    symbolic=symbolic
                         )
         self.home = np.array([pi/4, pi / 2, pi / 2, pi/4, pi/4, pi/4])
         self.qz = np.zeros(6)
@@ -82,8 +81,7 @@ class KR4R600(DHRobot):
                 ],  name = "KR 4 R600",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
-                    symbolic=symbolic,
-                    meshdir="/home/rossen/Desktop/MAPs/ros2_ws/src/kuka_kr3_support/meshes/kr3r540/collision/"
+                    symbolic=symbolic
                         )
         self.home = np.array([pi/4, pi / 2, pi / 2, pi/4, pi/4, pi/4])
         self.qz = np.zeros(6)
