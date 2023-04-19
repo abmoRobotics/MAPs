@@ -52,7 +52,7 @@ def main():
     drawShuttle = DrawPlanarMotor(world=world, size=CELL_SIZE)
 
     # Set desired positions for testing
-    desired_positions = np.array([[6.0, 5.0], [2.0, 5.0], [0.0, 7.0]])
+    desired_positions = np.array([[5.0, 5.0], [2.0, 5.0], [0.0, 7.0]])
     # desired_positions = [[2.0, 2.0], [2.0, 5.0], [0.0, 7.0]]
 
     # Set desired positions for testing
@@ -73,7 +73,8 @@ def main():
         # Handle events
         for shuttle in simulator.get_shuttles():
             drawShuttle.draw(screen, shuttle)
-            #shuttle.update(dt)
+            drawShuttle.draw_arrow_to_goal(screen, shuttle)
+            # shuttle.update(dt)
         pygame.display.flip()
         predictor = ShuttlePredictor(copy.deepcopy(simulator.get_shuttles()), dt, 10)
         potentials = predictor.predict()
@@ -86,7 +87,7 @@ def main():
         simulator.collision_detection()
 
         # Flip the display
-        
+
 
         print(f'Current time: {relative_time:.2f} seconds')
 

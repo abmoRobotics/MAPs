@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from manipulators.manipulators import PlanarMotor
 import pygame
-
+import numpy as np
 
 class World(ABC):
     def __init__(self):
@@ -58,3 +58,21 @@ class DrawPlanarMotor():
         # Center the text in the cell
         text_rect = text.get_rect(center=(x * self.size + self.size / 2, y * self.size + self.size / 2))
         screen.blit(text, text_rect)
+
+    def draw_arrow_to_goal(self, screen: pygame.display, shuttle: PlanarMotor, arrow_size: int = 10):
+        import math
+        pygame.draw.line(screen, self.world.red, shuttle.get_position() * self.size + self.size / 2, shuttle.desired_position * self.size + self.size / 2, 2)
+        pos1 = shuttle.get_position()
+        dx = shuttle.desired_position[0] - shuttle.get_position()[0]
+        dy = shuttle.desired_position[1] - shuttle.get_position()[1]
+        angle = math.atan2(dy, dx)
+
+        # # Draw arrow head
+        # arrow_tip_x = (shuttle.desired_position[0] - arrow_size * np.cos(angle))
+        # arrow_tip_y = (shuttle.desired_position[1] - arrow_size * np.sin(angle))
+
+        # arrow_point1 = (arrow_tip_x + arrow_size * math.sin(angle), arrow_tip_y - arrow_size * math.cos(angle))
+        # arrow_point2 = (arrow_tip_x - arrow_size * math.sin(angle), arrow_tip_y + arrow_size * math.cos(angle))
+
+        # pygame.draw.line(screen, self.world.red, shuttle.desired_position * self.size, arrow_point1, 2)
+        # pygame.draw.line(screen, self.world.red, shuttle.desired_position * self.size, arrow_point2, 2)
