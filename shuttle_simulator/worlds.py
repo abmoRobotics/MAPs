@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from manipulators import PlanarMotor
+from manipulators.manipulators import PlanarMotor
 import pygame
 
 
@@ -19,12 +19,12 @@ class World(ABC):
 
 
 class GridWorld(World):
-    def __init__(self, grid_size: tuple, screen_size: tuple) -> None:
+    def __init__(self, grid_size: tuple, screen_size: tuple, cell_size: int) -> None:
         super().__init__()
         self.grid_size = grid_size
         self.screen_size = screen_size
 
-        self.cell_size = 50
+        self.cell_size = cell_size
         self.initialize()
 
     def initialize(self):
@@ -49,8 +49,8 @@ class DrawPlanarMotor():
         self.size = size
 
     def draw(self, screen: pygame.display, shuttle: PlanarMotor):
-        x, y = shuttle.position
-        idx = shuttle.idx
+        x, y = shuttle.get_position()
+        idx = shuttle.get_idx()
         pygame.draw.rect(screen, self.world.black, (x * self.size, y * self.size, self.size, self.size))
         # Print idx on top of the shuttle
         font = pygame.font.SysFont('Arial', 30)
