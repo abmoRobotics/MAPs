@@ -35,7 +35,7 @@ class KR3R540(DHRobot):
                     RevoluteDH(           alpha=-pi/2, d=-0.260),
                     RevoluteDH(           alpha=pi/2),
                     RevoluteDH(                        d=-0.075)
-                ],  name = "KR 3 R540",
+                ],  name = "KR_3_R540_",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
                     symbolic=symbolic
@@ -78,7 +78,7 @@ class KR4R600(DHRobot):
                     RevoluteDH(           alpha=-pi/2, d=-0.310),
                     RevoluteDH(           alpha=pi/2),
                     RevoluteDH(                        d=-0.075)
-                ],  name = "KR 4 R600",
+                ],  name = "KR_4_R600_",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
                     symbolic=symbolic
