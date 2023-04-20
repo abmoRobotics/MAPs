@@ -42,12 +42,12 @@ class Shuttle(Node):
 
         # Define callback timer
         timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.timer = self.create_timer(timer_period, self.shuttle_callback)
         
         self.mode = ShuttleMode()
         
 
-    def timer_callback(self):
+    def shuttle_callback(self):
         try:
             self.number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
         except:
