@@ -29,7 +29,7 @@ class KR3R540(DHRobot):
 
         super().__init__(
                 [
-                    RevoluteDH(a=-0.020 , alpha=-pi/2, d=-0.345 , offset=pi/2),
+                    RevoluteDH(a=-0.020 , alpha=-pi/2, d=0.345 , offset=pi/2),
                     RevoluteDH(a=0.260),
                     RevoluteDH(a=0.020  , alpha=pi/2            , offset=-pi/2),
                     RevoluteDH(           alpha=-pi/2, d=-0.260),
@@ -40,7 +40,7 @@ class KR3R540(DHRobot):
                     keywords=("dynamics", "symbolic", "mesh"),
                     symbolic=symbolic
                         )
-        self.home = np.array([pi/4, pi / 2, pi / 2, pi/4, pi/4, pi/4])
+        self.home = np.array([0, -pi/2, pi/2, 0, 0, 0])
         self.qz = np.zeros(6)
         
         self.addconfiguration("home", self.home)
@@ -72,7 +72,7 @@ class KR4R600(DHRobot):
 
         super().__init__(
                 [
-                    RevoluteDH(alpha=-pi/2, d=-0.330 , offset=pi/2),
+                    RevoluteDH(alpha=-pi/2, d=0.330 , offset=pi/2),
                     RevoluteDH(a=0.290),
                     RevoluteDH(a=0.020  , alpha=pi/2            , offset=-pi/2),
                     RevoluteDH(           alpha=-pi/2, d=-0.310),
@@ -83,7 +83,7 @@ class KR4R600(DHRobot):
                     keywords=("dynamics", "symbolic", "mesh"),
                     symbolic=symbolic
                         )
-        self.home = np.array([pi/4, pi / 2, pi / 2, pi/4, pi/4, pi/4])
+        self.home = np.array([0, -pi/2, pi/2, 0, 0, 0])
         self.qz = np.zeros(6)
         
         self.addconfiguration("home", self.home)
