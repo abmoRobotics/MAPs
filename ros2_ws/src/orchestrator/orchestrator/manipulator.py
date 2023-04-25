@@ -31,13 +31,13 @@ class Manipulator(Node):
         self.kuka540 = KR3R540()
         self.kuka600 = KR4R600()
 
-        number_of_kuka540 = 4
-        number_of_kuka600 = 5
+        number_of_kuka540 = 0
+        number_of_kuka600 = 8
 
         name540 = number_of_kuka540 * [self.kuka540._name]
         name600 = number_of_kuka600 * [self.kuka600._name]
 
-        self.name_of_manipulators = np.concatenate((name540, name600))
+        self.name_of_manipulators = np.concatenate((name600, name540))
         self.publisher_array = []
         self.msg = []
         
@@ -54,12 +54,9 @@ class Manipulator(Node):
         
             self.msg.append(create_joint_state_message_array(joint_names, 
                                                                 len(self.name_of_manipulators)))
-        print(self.publisher_array)
-        print(self.msg)
-        for idx, publisher in enumerate(self.publisher_array):
-            print(publisher)
+
         # Define callback timer
-        timer_period = 0.5  # seconds
+        timer_period = 0.1  # seconds
         self.new_goal = True
         self.pos = []
         self.vel = []
@@ -69,22 +66,27 @@ class Manipulator(Node):
 
         if self.new_goal:
             for idx, publisher in enumerate(self.publisher_array):
-                    pose = SE3.Trans(0.6, -0.3, 0.1) * SE3.OA([0, 1, 0], [0, 0, -1])
-                    sol = self.kuka540.ik_lm_chan(pose)
-                    self.qt = rtb.jtraj(self.kuka540.home, sol[0], 10)
-                    print(str(idx)+"  mellemrum   "+str(publisher))
+                    #print(len(self.pos))
+                    pose = SE3.Trans(0.5, 0.3, 0.1) * SE3.OA([0, 1, 0], [0, 0, -1])
+                    sol = self.kuka600.ik_lm_chan(pose)
+                    self.qt = rtb.jtraj(self.kuka600.home, self.kuka600.qz, 100)
+                    #print(str(idx)+"  mellemrum   "+str(publisher))
                     self.pos.append(self.qt.q.tolist())
                     self.vel.append(self.qt.qd.tolist())
+                    
 
         if len(self.pos) > 7 and len(self.vel) > 7 and self.new_goal:
-            for idy, pos in enumerate(self.pos):
+            for idy, pos in enumerate(self.pos[0]):
                 for idx, publisher in enumerate(self.publisher_array):
-                    #time.sleep(0.5) # Need to be removed
-                    self.msg[idx][0].position = self.pos[idy][idx]
-                    self.msg[idx][0].velocity = self.vel[idy][idx]
+                    #print("SELF:POS: " + str(self.pos))
+                    time.sleep(0.01) # Need to be removed
+                    self.msg[idx][0].position = self.pos[idx][idy]
+                    self.msg[idx][0].velocity = self.vel[idx][idy]
+                    #print("INDI POS: " + str(self.pos[idy][idx]))
                     publisher[0].publish(self.msg[idx][0])
 
             self.new_goal = False
+            print("New goal is: " + str(self.new_goal))
         
             
             # for idx, publisher in enumerate(self.publisher_array):
