@@ -26,15 +26,17 @@ class KR3R540(DHRobot):
             pi = sym.pi()
         else:
             from math import pi
+        
+        deg = pi / 180
 
         super().__init__(
                 [
-                    RevoluteDH(a=-0.020 , alpha=-pi/2, d=0.345 , offset=pi/2),
-                    RevoluteDH(a=0.260),
-                    RevoluteDH(a=0.020  , alpha=pi/2            , offset=-pi/2),
-                    RevoluteDH(           alpha=-pi/2, d=-0.260),
-                    RevoluteDH(           alpha=pi/2),
-                    RevoluteDH(                        d=-0.075)
+                    RevoluteDH(a=-0.020, alpha=-pi/2, d= 0.345, offset= pi/2, qlim=[-170 * deg, 170 * deg]),
+                    RevoluteDH(a= 0.260,                                      qlim=[-170 * deg, 50  * deg]),
+                    RevoluteDH(a= 0.020, alpha= pi/2,           offset=-pi/2, qlim=[-110 * deg, 155 * deg]),
+                    RevoluteDH(          alpha=-pi/2, d=-0.260,               qlim=[-175 * deg, 175 * deg]),
+                    RevoluteDH(          alpha= pi/2,                         qlim=[-120 * deg, 120 * deg]),
+                    RevoluteDH(                       d=-0.075,               qlim=[-350 * deg, 350 * deg])
                 ],  name = "KR_3_R540_",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
@@ -70,14 +72,16 @@ class KR4R600(DHRobot):
         else:
             from math import pi
 
+        deg = pi / 180
+
         super().__init__(
                 [
-                    RevoluteDH(alpha=-pi/2, d=0.330 , offset=pi/2),
-                    RevoluteDH(a=0.290),
-                    RevoluteDH(a=0.020  , alpha=pi/2            , offset=-pi/2),
-                    RevoluteDH(           alpha=-pi/2, d=-0.310),
-                    RevoluteDH(           alpha=pi/2),
-                    RevoluteDH(                        d=-0.075)
+                    RevoluteDH(         alpha=-pi/2, d= 0.330, offset= pi/2, qlim=[-170 * deg, 170 * deg]),
+                    RevoluteDH(a=0.290,                                      qlim=[-195 * deg, 40  * deg]),
+                    RevoluteDH(a=0.020, alpha= pi/2,           offset=-pi/2, qlim=[-115 * deg, 150 * deg]),
+                    RevoluteDH(         alpha=-pi/2, d=-0.310,               qlim=[-185 * deg, 180 * deg]),
+                    RevoluteDH(         alpha= pi/2,                         qlim=[-120 * deg, 120 * deg]),
+                    RevoluteDH(                      d=-0.075,               qlim=[-350 * deg, 350 * deg])
                 ],  name = "KR_4_R600_",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
