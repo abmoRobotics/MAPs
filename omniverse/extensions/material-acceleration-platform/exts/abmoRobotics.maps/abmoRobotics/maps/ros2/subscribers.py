@@ -19,7 +19,7 @@ class JointStateSubscriber(Node):
 
     def listener_callback(self, msg: JointState):
         if not self.position == msg.position:
-            self.prim_path.set_target_position(msg.position)
+            self.prim_path.set_joint_target(msg.position)
             self.position = msg.position
 
 
@@ -37,4 +37,3 @@ class InitialPoseSubscriber(Node):
 
     def listener_callback(self, msg: Pose):
         self.prim_path.set_initial_transform(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
-        
