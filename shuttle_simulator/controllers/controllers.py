@@ -149,12 +149,15 @@ class ShuttlePredictor(Predictor):
         self.shuttles = shuttles
         self.states: List[ManipulatorState] = [shuttle.get_state() for shuttle in shuttles]
 
-    def predict(self) -> np.ndarray:
+    def predict(self, potentials: np.ndarray = None) -> np.ndarray:
         """ Predict future states of shuttles, and add potential to the states if they are in collision with other shuttles."""
 
         # Initialize variables
         is_finished = False
-        potentials = np.zeros((len(self.shuttles), 2))
+
+        if potentials is None:
+            potentials = np.zeros((len(self.shuttles), 2))
+
         first_control_signal = np.zeros((len(self.shuttles), 2))
         counter = 0
         # Predict future states until no collisions detected
@@ -171,11 +174,15 @@ class ShuttlePredictor(Predictor):
                     new_state = shuttle.get_next_state(dt=self.dt, current_state=current_state, additional_force=potentials[idx])  # Get next state of the shuttle
                     states[idx] = new_state                       # Update the current state of the shuttle
                     if i == 0:
-                        first_control_signal[idx] = new_state.get_velocity()
+                        direction_vector = shuttle.get_desired_position() - new_state.get_position()
+                        velocity_magnitude = np.linalg.norm(new_state.get_velocity()) * 0.25
+                        velocity_command = new_state.get_velocity()# + direction_vector * velocity_magnitude
+                        first_control_signal[idx] = velocity_command
 
                 # Check if there is a collision, and calculate potential field.
                 collision, potential = self.potentialFieldChecker(self.shuttles, states)
                 potentials += potential
+                
 
                 # If collision detected, then stop predicting, and add potential to the states, and try again with different potential field
                 if collision:
@@ -191,9 +198,10 @@ class ShuttlePredictor(Predictor):
                 is_finished = True
  
         counter += 1
-        print(counter)
-
-        return first_control_signal
+        #print(counter)
+        print(f'Potentials: {potentials[0]}')
+   #     print(f) 
+        return first_control_signal, potentials
 
     def potentialFieldChecker(self, shuttles, states: List[ManipulatorState]) -> Tuple[bool, np.ndarray]:
         """ Check if there is a collision between shuttles, and calculate the potential field.
@@ -221,9 +229,11 @@ class ShuttlePredictor(Predictor):
                         collision = True
                         # If there is a collision, then calculate the repulsive force
                         force_magnitude = repulsive_gain / (L_inifnite_norm**2 + 0.00001)
+                        #force_magnitude = np.clip(force_magnitude, -2, 2)
                         force_direction = (states[i].get_position() - states[j].get_position()) / L_inifnite_norm
                         repulsive_force[i] += force_magnitude * force_direction
 
+        
         # If there is no collision, then return False, and 0 as the potential
         if not collision:
             return False, repulsive_force

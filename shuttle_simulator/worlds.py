@@ -2,12 +2,15 @@ from abc import ABC, abstractmethod
 from manipulators.manipulators import PlanarMotor
 import pygame
 import numpy as np
-
+import math
 class World(ABC):
     def __init__(self):
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
         self.red = (255, 0, 0)
+        self.green = (0, 255, 0)
+        self.blue = (0, 0, 255)
+        self.yellow = (255, 255, 0)
 
     @abstractmethod
     def initialize(self):
@@ -60,12 +63,19 @@ class DrawPlanarMotor():
         screen.blit(text, text_rect)
 
     def draw_arrow_to_goal(self, screen: pygame.display, shuttle: PlanarMotor, arrow_size: int = 10):
-        import math
+
         pygame.draw.line(screen, self.world.red, shuttle.get_position() * self.size + self.size / 2, shuttle.desired_position * self.size + self.size / 2, 2)
         pos1 = shuttle.get_position()
         dx = shuttle.desired_position[0] - shuttle.get_position()[0]
         dy = shuttle.desired_position[1] - shuttle.get_position()[1]
         angle = math.atan2(dy, dx)
+
+    def draw_potential_vector(self, screen: pygame.display, shuttle: PlanarMotor, arrow_size: int = 10, potential: np.ndarray = None):
+        if potential is None:
+            potential = shuttle
+            # Draw line from current position to potential vector
+        pygame.draw.line(screen, self.world.green, shuttle.get_position() * self.size + self.size / 2, (shuttle.get_position() + potential) * self.size + self.size / 2, 2)
+
 
         # # Draw arrow head
         # arrow_tip_x = (shuttle.desired_position[0] - arrow_size * np.cos(angle))

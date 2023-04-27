@@ -12,7 +12,7 @@ class PlanarMotor(Manipulator):
         self._velocity = np.array([0.0, 0.0])
         self._shuttle_state = PlanarMotorState(position=position, velocity=self._velocity)
 
-        self.controller = PDController(p_gain=1, d_gain=1, max_velocity=1)
+        self.controller = PDController(p_gain=0.5, d_gain=0.01, max_velocity=1)
         self.controller.set_initial_position(position)
         self.controller.set_initial_velocity(self.get_velocity())
 
@@ -45,6 +45,9 @@ class PlanarMotor(Manipulator):
     def set_desired_position(self, desired_position):
         self.desired_position = desired_position
 
+    def get_desired_position(self):
+        return self.desired_position
+
     def get_state(self):
         return self._shuttle_state
 
@@ -71,8 +74,15 @@ class PlanarMotor(Manipulator):
         self.controller.update(current_state.get_position(), current_state.get_velocity(), self.desired_position)
 
         self.controller.get_control_signal(1)
+        # print(f'Control signal: {self.controller.get_control_signal(1)}')
+        # print(f'Additional force: {additional_force}')
         # Update velocity
-        current_state.set_velocity(self.controller.get_control_signal(dt) + additional_force)
+        norm = np.linalg.norm(self.controller.get_control_signal(1))
+        force = (self.controller.get_control_signal(dt) + additional_force) * norm / np.linalg.norm(self.controller.get_control_signal(dt) + additional_force) 
+        # print(norm)
+        # print(force)
+        # print(f'norm')
+        current_state.set_velocity(force)
         # Update position
         current_state.set_position(current_state.get_position() + current_state.get_velocity() * dt)
         return current_state

@@ -4,8 +4,8 @@ import copy
 
 
 class MultiShuttleSimulator:
-    def __init__(self, num_shuttles, grid_size):
-        self.shuttles = [PlanarMotor(position=np.array([i * 2., 0.]), idx=i, grid_size=grid_size) for i in range(num_shuttles)]
+    def __init__(self, num_shuttles, grid_size, initial_positions=None):
+        self.shuttles = [PlanarMotor(position=initial_positions[i], idx=i, grid_size=grid_size) for i in range(num_shuttles)]
         self.initial_positions = [copy.deepcopy(shuttle.get_position()) for shuttle in self.shuttles]
         self.current_shuttle = 0
 
