@@ -57,11 +57,6 @@ class ForceFieldController:
 
             if not collision:
                 has_valid_trajectory = True
-        #import time
-        #time.sleep(10)
-        #potential_field = np.clip(potential_field, -self.base_controller.max_veloicty, self.base_controller.max_veloicty)
-        # control_signal = np.clip(control_signal, -self.base_controller.max_veloicty, self.base_controller.max_veloicty)
-        # potential_field = np.clip(potential_field, -self.base_controller.max_veloicty, self.base_controller.max_veloicty)
         return control_signal, potential_field
 
     def new_states(self, current_position: np.ndarray, current_velocity: np.ndarray, target_position: np.ndarray, potential_field: np.ndarray = np.array([0.0, 0.0])):
@@ -80,7 +75,7 @@ class ForceFieldController:
     def potential_field_checker(self, current_position: np.ndarray, current_velocity: np.ndarray, target_position: np.ndarray, potential_field: np.ndarray):
         """Check if the potential field is valid"""
         # Paramters
-        repulsive_gain = 0.003#0.003
+        repulsive_gain = 0.003
         epsilon = 1e-5
         # Variables
         repulsive_force = np.zeros((current_position.shape[0], 2))
@@ -89,13 +84,7 @@ class ForceFieldController:
             for j in range(current_position.shape[0]):
                 if i != j:
                     distance = np.linalg.norm(current_position[i,0:2] - current_position[j,0:2], np.inf)
-                    if i == 0 and j == 1:
-                        # print(f'pos i: {current_position[i,0:2]}')
-                        # print(f'pos j: {current_position[j,0:2]}')
-                        #print(f'distance: {distance}')
-                        pass
-                        
-                    if distance < 0.12:
+                    if distance < 0.14:
                         #print(f'Collision between {i} and {j}')
                         collision = True
                         # Calculate the repulsive force

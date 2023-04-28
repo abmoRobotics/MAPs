@@ -5,7 +5,7 @@ from pxr import Gf, Sdf
 
 class Manipulator:
     def __init__(self, manipulator_root: str, manipulator_index: int) -> None:
-        self.manipulator_root = f"{manipulator_root}_{manipulator_index:02}"
+        self.manipulator_root = f"{manipulator_root}{manipulator_index:02}"
         self.manipulator_index = manipulator_index
         self.simulator = OmniverseInterface()
 
