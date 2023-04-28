@@ -583,6 +583,6 @@
   //"python.linting.enabled": true,
   //"python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--ignore=F403,F401", "--max-line-length=140"],
+  "python.linting.flake8Args": ["--ignore=F403,F401", "--max-line-length=120"],
   "ros.distro": "foxy"
 }
