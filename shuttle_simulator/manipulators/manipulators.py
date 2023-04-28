@@ -76,7 +76,7 @@ class PlanarMotor(Manipulator):
         self.controller.get_control_signal(1)
         # print(f'Control signal: {self.controller.get_control_signal(1)}')
         # print(f'Additional force: {additional_force}')
-        # Update velocity
+        # Update velocity3
         norm = np.linalg.norm(self.controller.get_control_signal(1))
         force = (self.controller.get_control_signal(dt) + additional_force) * norm / np.linalg.norm(self.controller.get_control_signal(dt) + additional_force) 
         # print(norm)

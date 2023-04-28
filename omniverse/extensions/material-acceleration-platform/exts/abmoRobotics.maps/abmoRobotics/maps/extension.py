@@ -42,9 +42,7 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
         with self._window.frame:
             with ui.VStack():
                 label = ui.Label("") 
-
-
-                    
+    
                 def on_reset():
                     self.stage: Usd.Stage = omni.usd.get_context().get_stage()
                     for i in range(50):
@@ -71,6 +69,7 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
                 with ui.HStack():
                     ui.Button("Start", clicked_fn=on_click)
                     ui.Button("Reset", clicked_fn=on_reset)
+
     def start_ros(self):
         try:
             print("starting ros")
@@ -83,8 +82,8 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
         print("[abmoRobotics.maps] abmoRobotics maaps shutdown")
 
     def on_event(self, e: carb.events.IEvent):
-        if not self.ros_started:
-            self.start_ros()
+        # if not self.ros_started:
+        #     self.start_ros()
 
         dt = time.perf_counter() - self.last_time
         self.last_time = time.perf_counter()

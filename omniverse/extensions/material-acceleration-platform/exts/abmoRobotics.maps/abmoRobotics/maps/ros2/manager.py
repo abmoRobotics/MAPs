@@ -1,5 +1,4 @@
 import rclpy
-from rclpy.node import Node
 import pxr.Usd as Usd
 import pxr.Sdf as Sdf
 from .subscribers import JointStateSubscriber, InitialPoseSubscriber
@@ -12,7 +11,6 @@ import numpy as np
 
 class RosManager:
     def __init__(self) -> None:
-
         self.joint_state_subscribers: List[JointStateSubscriber] = []
         self.initial_pose_subscribers: List[InitialPoseSubscriber] = []
         self.shuttles: List[PlanarMotor] = []
@@ -25,7 +23,7 @@ class RosManager:
     def initialize_ros(self):
         if not rclpy.utilities.ok():
             rclpy.init()
-        self.dummy_node = rclpy.create_node('dummy_node')
+        self.dummy_node = rclpy.create_node("dummy_node")
 
     def reset_manager(self):
         self.joint_state_subscribers = []
@@ -40,9 +38,11 @@ class RosManager:
         self.shuttles.append(shuttle)
 
     def check_for_new_shuttle_topics(self):
-        shuttle_topics = [x[0] for x in self.dummy_node.get_topic_names_and_types() if ("shuttle" in x[0] and x[0].endswith("joint_command"))]
+        shuttle_topics = [
+            x[0] for x in self.dummy_node.get_topic_names_and_types() if ("shuttle" in x[0] and x[0].endswith("joint_command"))
+        ]
         for idx, topic in enumerate(shuttle_topics):
-            sdf_path = Sdf.Path(f'{self.shuttle_prefix}{idx:02}')
+            sdf_path = Sdf.Path(f"{self.shuttle_prefix}{idx:02}")
             prim: Usd.Prim = self.stage.GetPrimAtPath(sdf_path)
             if bool(self.dummy_node.get_publishers_info_by_topic(topic)):
                 if not prim.IsValid():
@@ -52,9 +52,7 @@ class RosManager:
                     self.add_subscriber(topic, planar_motor)
             else:
                 if prim.IsValid():
-                    omni.kit.commands.execute('DeletePrims',
-                                              paths=[Sdf.Path(f'{self.shuttle_prefix}{idx:02}')],
-                                              destructive=False)
+                    omni.kit.commands.execute("DeletePrims", paths=[Sdf.Path(f"{self.shuttle_prefix}{idx:02}")], destructive=False)
 
     def _apply_control_input(self, control_inputs):
         for shuttle, control_input in zip(self.shuttles, control_inputs):
@@ -81,10 +79,12 @@ class RosManager:
             print("Collision detected")
 
         try:
-            self.potential_field, control_signal = self.shuttles[0].apply_force_field_controller(positions, velocities, target_positions, potentials)
+            self.potential_field, control_signal = self.shuttles[0].apply_force_field_controller(
+                positions, velocities, target_positions, potentials
+            )
             self._apply_control_input(control_signal)
         except Exception as e:
-            print(f'Err: {e}')
+            print(f"Err: {e}")
 
         return potentials
 

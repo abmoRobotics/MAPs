@@ -2,7 +2,7 @@
   "files.associations": {
     "*.kit": "toml"
   },
-  "editor.rulers": [120],
+  "editor.rulers": [140],
 
   // Python modules search paths:
   "python.analysis.extraPaths": [
@@ -568,21 +568,36 @@
     "${workspaceFolder}/app/kit/exts/omni.audioplayer",
     "/opt/ros/foxy/lib/python3.8/site-packages/"
   ],
-
+  "ros.distro": "foxy",
   // Python & Pylance Setup
   "python.languageServer": "Pylance",
-  "python.pythonPath": "${workspaceFolder}/app/kit/python/bin/python3",
-  "python.defaultInterpreterPath": "${workspaceFolder}/app/kit/python/bin/python3",
+  // "python.pythonPath": "${workspaceFolder}/app/kit/python/bin/python3",
+  // "python.defaultInterpreterPath": "${workspaceFolder}/app/kit/python/bin/python3",
+  "python.defaultInterpreterPath": "~/.local/share/ov/pkg/isaac_sim-2022.2.1/kit/python/bin/python3.7",
 
   // We use "black" as a formatter:
-  "python.formatting.provider": "black",
+  //"python.formatting.provider": "black",
   //"python.formatting.blackArgs": ["--line-length", "120"],
-  "editor.formatOnSave": true,
+  //"editor.formatOnSave": true,
 
   // Use flake8 for linting
-  //"python.linting.enabled": true,
-  //"python.linting.pylintEnabled": false,
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--ignore=F403,F401", "--max-line-length=120"],
-  "ros.distro": "foxy"
+  "python.linting.flake8Args": ["--max-line-length=140"], // ["--ignore=F403", "--max-line-length=140"],
+  // "editor.formatOnSave": true,
+  // "python.formatting.blackPath": "~/.local/bin/black",
+  // "python.formatting.provider": "black"
+  // "editor.defaultFormatter": "black"
+  // "python.formatting.blackArgs": ["-l 120"],
+
+  "python.formatting.provider": "none",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+  },
+
+  "black-formatter.args": [
+    "--line-length", "140"
+  ]
 }
