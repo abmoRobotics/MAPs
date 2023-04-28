@@ -98,8 +98,8 @@ class PlanarMotor(Manipulator):
         self.set_target_velocity([control_signal[0], control_signal[1], 0.0, 0.0, 0.0, 0.0])
 
     def apply_force_field_controller(self, current_positions, current_velocities, target_positions, potential_fields):
-        
-        controller = ForceFieldController(dt=0.015, timesteps=15, p_gain=2.5, d_gain=0.2, max_velocity=1) # timesteps = 15
+        max_velocity = 1
+        controller = ForceFieldController(dt=0.015, timesteps=15, p_gain=2.5, d_gain=0.5, max_velocity=max_velocity) # timesteps = 15
         #current_position = self.get_joint_position()
         #current_velocity = self.get_joint_velocity()
         control_signal, repulsive_field = controller.predict_trajectory(current_position=current_positions[:,0:2], target_position=target_positions[:,0:2], current_velocity=current_velocities[:, 0:2], potential_field=potential_fields)
@@ -121,14 +121,7 @@ class PlanarMotor(Manipulator):
                     control_signal[idx] = o / factor * 0.95
         self.previous_control_signal = control_signal
         idx = self.manipulator_index
-        #self.set_target_velocity([-control_signal[idx, 0], -control_signal[idx, 1], 0.0, 0.0, 0.0, 0.0])
-
-        #controller2 = Controller(p_gain=1, d_gain=0.1, max_veloicty=0.5)
-        # print(f'current_positions: {current_positions[:,0:2]}')
-        # print(f'target_positions: {target_positions[:,0:2]}')
-        # print(f'current_velocities: {current_velocities[:,0:2]}')
-        #control_signal2 = controller2.get_control_signal(current_position=current_positions[:,0:2], target_position=target_positions[:,0:2], current_velocity=current_velocities[:,0:2])
-        #print("ok")
+        control_signal = np.clip(control_signal, -max_velocity, max_velocity)
         return (repulsive_field, control_signal)
 
 # class ForceFieldManager:

@@ -92,7 +92,7 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
        # print(f)
         if self.ros_started:
             if self.ros_manager.shuttles[0] is not None:
-                a = self.ros_manager.calculate_and_apply_control_input()
+                self.ros_manager.calculate_and_apply_control_input()
             for joint_state_subscriber in self.ros_manager.joint_state_subscribers:
                 rclpy.spin_once(joint_state_subscriber, timeout_sec=0.00000000000000001)
             for initial_pose_subscriber in self.ros_manager.initial_pose_subscribers:

@@ -576,12 +576,13 @@
 
   // We use "black" as a formatter:
   "python.formatting.provider": "black",
-  "python.formatting.blackArgs": ["--line-length", "120"],
+  //"python.formatting.blackArgs": ["--line-length", "120"],
+  "editor.formatOnSave": true,
 
   // Use flake8 for linting
-  "python.linting.enabled": true,
-  "python.linting.pylintEnabled": false,
+  //"python.linting.enabled": true,
+  //"python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--ignore=F403,F401", "--max-line-length=120"],
+  "python.linting.flake8Args": ["--ignore=F403,F401", "--max-line-length=140"],
   "ros.distro": "foxy"
 }

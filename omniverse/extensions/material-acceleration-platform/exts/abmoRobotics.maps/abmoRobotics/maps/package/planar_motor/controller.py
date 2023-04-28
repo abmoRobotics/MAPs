@@ -84,12 +84,12 @@ class ForceFieldController:
             for j in range(current_position.shape[0]):
                 if i != j:
                     distance = np.linalg.norm(current_position[i,0:2] - current_position[j,0:2], np.inf)
-                    if distance < 0.14:
+                    if distance < 0.12:
                         #print(f'Collision between {i} and {j}')
                         collision = True
                         # Calculate the repulsive force
                         magnitude = repulsive_gain / (distance + epsilon)
-                        np.clip(magnitude, -0.25, 0.25)
+                        #np.clip(magnitude, -0.25, 0.25)
                         # magnitude = np.clip(magnitude, 0, 2)
                         # magnitude = repulsive_gain * (1 - distance) #/ distance
                         direction = (current_position[i, 0:2] - current_position[j, 0:2]) / distance

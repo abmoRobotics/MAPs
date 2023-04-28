@@ -9,9 +9,10 @@ import omni.kit.commands
 from typing import List
 import numpy as np
 
+
 class RosManager:
     def __init__(self) -> None:
-        
+
         self.joint_state_subscribers: List[JointStateSubscriber] = []
         self.initial_pose_subscribers: List[InitialPoseSubscriber] = []
         self.shuttles: List[PlanarMotor] = []
@@ -21,12 +22,11 @@ class RosManager:
         self.initialize_ros()
         print("ROS initialized")
 
-
     def initialize_ros(self):
         if not rclpy.utilities.ok():
             rclpy.init()
         self.dummy_node = rclpy.create_node('dummy_node')
-    
+
     def reset_manager(self):
         self.joint_state_subscribers = []
         self.initial_pose_subscribers = []
@@ -72,15 +72,32 @@ class RosManager:
             target_positions[idx] = shuttle.get_joint_target()
 
         return velocities, positions, target_positions
-    
+
     def calculate_and_apply_control_input(self):
         velocities, positions, target_positions = self._get_current_shuttle_states()
         potentials = np.zeros((len(self.shuttles), 2))
-        
+
+        if self.check_for_collisions(positions):
+            print("Collision detected")
+
         try:
             self.potential_field, control_signal = self.shuttles[0].apply_force_field_controller(positions, velocities, target_positions, potentials)
             self._apply_control_input(control_signal)
         except Exception as e:
             print(f'Err: {e}')
-        
+
         return potentials
+
+    def check_for_collisions(self, positions):
+        distances = self.calculate_distances(positions)
+        return self.check_threshold(distances, 0.121)
+
+    def calculate_distances(self, points):
+        points = np.array(points)
+        diff = points[:, np.newaxis, :] - points[np.newaxis, :, :]
+        distances = np.max(np.abs(diff), axis=-1)
+        return distances
+
+    def check_threshold(self, distances, threshold):
+        np.fill_diagonal(distances, np.inf)  # Set diagonal elements to infinity to ignore self-distances
+        return np.any(distances < threshold)
