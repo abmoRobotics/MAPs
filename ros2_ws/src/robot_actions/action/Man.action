@@ -1,0 +1,5 @@
+int32 goal
+---
+int32[] goalresult
+---
+int32[] goalfeedback
