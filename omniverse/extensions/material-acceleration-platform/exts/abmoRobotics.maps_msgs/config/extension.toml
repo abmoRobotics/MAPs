@@ -6,7 +6,7 @@ version = "1.0.0"
 authors = ["NVIDIA"]
 
 # The title and description fields are primarily for displaying extension info in UI
-title = "abmoRobotics maps"
+title = "abmoRobotics maps custom messages"
 description="A simple python extension example to use as a starting point for your extensions."
 
 # Path (relative to the root) or content of readme markdown file for UI.
@@ -45,14 +45,32 @@ name = "abmoRobotics.maps_msgs"
 dependencies = [
     "omni.kit.ui_test" # UI testing extension
 ]
+[[native.library]]
+path = "bin/libtutorial_interfaces__python.so"
+[[native.library]]
+path = "bin/libtutorial_interfaces__rosidl_generator_c.so"
+[[native.library]]
+path = "bin/libtutorial_interfaces__rosidl_typesupport_c.so"
+[[native.library]]
+path = "bin/libtutorial_interfaces__rosidl_typesupport_connext_c.so"
+[[native.library]]
+path = "bin/libtutorial_interfaces__rosidl_typesupport_fastrtps_c.so"
+[[native.library]]
+path = "bin/libtutorial_interfaces__rosidl_typesupport_introspection_c.so"
 
-[[native.library]]
-path = "bin/libadd_on_msgs__python.so"
-[[native.library]]
-path = "bin/libadd_on_msgs__rosidl_generator_c.so"
-[[native.library]]
-path = "bin/libadd_on_msgs__rosidl_typesupport_c.so"
-[[native.library]]
-path = "bin/libadd_on_msgs__rosidl_typesupport_fastrtps_c.so"
-[[native.library]]
-path = "bin/libadd_on_msgs__rosidl_typesupport_introspection_c.so"
+
+# [[native.library]]
+# # path = "bin/libadd_on_msgs__python.so"
+# path = "srv/tutorial_interfaces_s__rosidl_typesupport_c.cpython-37m-x86_64-linux-gnu.so"
+# # [[native.library]]
+# # path = "bin/libadd_on_msgs__rosidl_generator_c.so"
+# # [[native.library]]
+# # path = "bin/libadd_on_msgs__rosidl_typesupport_c.so"
+# [[native.library]]
+# path = "srv/tutorial_interfaces_s__rosidl_typesupport_introspection_c.cpython-37m-x86_64-linux-gnu.so"
+# [[native.library]]
+# # path = "bin/libadd_on_msgs__rosidl_typesupport_fastrtps_c.so"
+# path = "srv/tutorial_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-37m-x86_64-linux-gnu.so"
+# [[native.library]]
+# # path = "bin/libadd_on_msgs__rosidl_typesupport_introspection_c.so"
+# #path = "srv/tutorial_interfaces_s__rosidl_typesupport_introspection_c.cpython-37m-x86_64-linux-gnu.so"

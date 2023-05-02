@@ -584,7 +584,7 @@
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--max-line-length=140"], // ["--ignore=F403", "--max-line-length=140"],
+  "python.linting.flake8Args": ["--ignore=D100,D101,D102,Q000", "--max-line-length=140"], // ["--ignore=F403", "--max-line-length=140"],
   // "editor.formatOnSave": true,
   // "python.formatting.blackPath": "~/.local/bin/black",
   // "python.formatting.provider": "black"
