@@ -1,5 +1,8 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.action import ActionServer
+from robot_actions.action import Man
+
 from sensor_msgs.msg import JointState
 import numpy as np
 import time
@@ -7,7 +10,11 @@ from spatialmath import SE3
 import roboticstoolbox as rtb
 import time
 
-from utils import create_joint_state_message_array, create_publisher_array, load_yaml_file
+from utils import (create_joint_state_message_array, 
+                    create_publisher_array, 
+                    load_yaml_file,
+                    create_action_server_array)
+
 from utils import KR4R600, KR3R540
 
 
@@ -31,8 +38,8 @@ class Manipulator(Node):
         self.kuka540 = KR3R540()
         self.kuka600 = KR4R600()
 
-        number_of_kuka540 = 0
-        number_of_kuka600 = 8
+        number_of_kuka540 = 2
+        number_of_kuka600 = 2
 
         name540 = number_of_kuka540 * [self.kuka540._name]
         name600 = number_of_kuka600 * [self.kuka600._name]
@@ -40,20 +47,28 @@ class Manipulator(Node):
         self.name_of_manipulators = np.concatenate((name600, name540))
         self.publisher_array = []
         self.msg = []
-        
+        self.action_server = []
 
         self.manipulators = {'name': 'manipulator', 'position': [0, 0, 0] }
     
         joint_names = ['joint0', 'joint1', 'joint2', 'joint3', 'joint4', 'joint5']
         for idx, name in enumerate(self.name_of_manipulators):
             self.publisher_array.append(create_publisher_array(self, 
-                                                                len(self.name_of_manipulators),
+                                                                1,
                                                                 topic_prefix=name, 
                                                                 topic_name='/joint_command',
                                                                 msg_type=JointState))
         
             self.msg.append(create_joint_state_message_array(joint_names, 
-                                                                len(self.name_of_manipulators)))
+                                                                1))
+        
+            self.action_server.append(create_action_server_array(self, 
+                                                    Man, 
+                                                    topic_prefix=name, 
+                                                    callback_type=self.action_mani_callback, 
+                                                    n_robots=1))
+            
+        print(self.action_server)
 
         # Define callback timer
         timer_period = 0.1  # seconds
@@ -97,7 +112,11 @@ class Manipulator(Node):
             #     #print(self.vel)
 
         
+    def action_mani_callback(self):
 
+
+        msg = Manipulator.goal_feedback()
+        pass
 
 
 def main(args=None):
