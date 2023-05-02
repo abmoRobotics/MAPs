@@ -146,12 +146,12 @@ class ROS2Interface(Node):
         pass
 
     def _stop_components(self) -> None:
-        """Stop all components"""
+        """Stop all components."""
         for component in self._components:
             component.stop()
 
     def shutdown(self) -> None:
-        """Shutdown the ROS2Interface inteface"""
+        """Shutdown the ROS2Interface inteface."""
         self._update_event = None
         self._timeline_event = None
         self._stage_event = None
@@ -163,7 +163,7 @@ class ROS2Interface(Node):
 
 def destroy_maps_msgs_interface(ROS2Interface: ROS2Interface) -> None:
     """
-    Release the Ros2Bridge interface
+    Release the Ros2Bridge interface.
 
     :param bridge: The Ros2Bridge interface
     :type bridge: Ros2Bridge
@@ -172,35 +172,18 @@ def destroy_maps_msgs_interface(ROS2Interface: ROS2Interface) -> None:
 
 
 def create_payload(context: omni.usd._usd.UsdContext, prim_path: str, asset_path: str):
+    """Create a payload."""
     omni.kit.commands.execute("CreatePayload", usd_context=context, path_to=Sdf.Path(prim_path), asset_path=asset_path, instanceable=False)
     print("Created Payload")
 
 
-def delete_payload(context: omni.usd._usd.UsdContext, prim_path: str):
+def delete_prims(context: omni.usd._usd.UsdContext, prim_path: str):
+    """Delete prims."""
     omni.kit.commands.execute("DeletePrims", paths=[Sdf.Path(prim_path)], destructive=False)
 
 
-def transform_prim_kr4R600(prim_path: str, x: float, y: float, z: float):
-    print(Gf.Matrix4d(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0))
-    omni.kit.commands.execute(
-        "TransformPrim",
-        path=Sdf.Path(prim_path),
-        # new_transform_matrix=Gf.Matrix4d(0.001, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, x, y, z, 1.0),
-        new_transform_matrix=Gf.Matrix4d(0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, -0.001, 0.0, 0.0, x, y, z, 1.0),
-    )
-
-
-def transform_prim_kr3R540(prim_path: str, x: float, y: float, z: float):
-    print(Gf.Matrix4d(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0))
-    omni.kit.commands.execute(
-        "TransformPrim",
-        path=Sdf.Path(prim_path),
-        new_transform_matrix=Gf.Matrix4d(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0),
-        # new_transform_matrix=Gf.Matrix4d(0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, -0.001, 0.0, 0.0, x, y, z, 1.0),
-    )
-
-
 def transform_prim(prim_path: str, matrix: Gf.Matrix3d):
+    """Transform a prim."""
     omni.kit.commands.execute(
         "TransformPrim",
         path=Sdf.Path(prim_path),
@@ -209,6 +192,7 @@ def transform_prim(prim_path: str, matrix: Gf.Matrix3d):
 
 
 def convert_position_orientation_to_matrix(position: Gf.Vec3d, orientation: Gf.Quatd, scale: float) -> Gf.Matrix4d:
+    """Convert position and orientation to a matrix."""
     # Create a translation matrix from the position
     translation_matrix = Gf.Matrix4d().SetTranslate(position)
 
