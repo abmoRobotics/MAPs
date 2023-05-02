@@ -18,7 +18,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='anton',
+    author='Mads',
+    author_email='mrma19@student.aau.dk',
+    maintainer='Anton',
     maintainer_email='abmo19@student.aau.dk',
     description='TODO: Package description',
     license='TODO: License declaration',
@@ -26,8 +28,8 @@ setup(
     entry_points={
         'console_scripts': [
             'shuttle = orchestrator.shuttle:main',
-            'gui = orchestrator.gui:main'
-            #'manipulator = orchestrator.manipulator:main'
+            'gui = orchestrator.gui:main',
+            'manipulator = orchestrator.manipulator:main'
             #'task_planner = orchestrator.task_planner:main'
         ],
     },
