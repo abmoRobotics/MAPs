@@ -26,7 +26,7 @@ class GUI(Node):
 
         # Define callback timer
         timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.timer = self.create_timer(timer_period, self.gui_callback)
 
         joint_names = ['x_translation', 'y_translation', 'z_translation', 'x_rotation', 'y_rotation', 'z_rotation']
         #publisher_array= create_publisher_array(self, number_of_shuttles, topic_prefix="configuration/shuttle", topic_name='/initialPosition', msg_type=Pose)
@@ -43,7 +43,7 @@ class GUI(Node):
 
         #self.save_yaml()
 
-    def timer_callback(self):
+    def gui_callback(self):
         try:
             pass
             #self.get_logger().info(str(self.get_parameter('shuttle1_position').get_parameter_value().double_array_value))
