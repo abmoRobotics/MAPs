@@ -67,6 +67,7 @@ class ROS2Interface(Node):
         self._stage_event = self._usd_context.get_stage_event_stream().create_subscription_to_pop(self._on_stage_event)
         self._physx_event = self._physx_interface.subscribe_physics_step_events(self._on_physics_event)
 
+        self._stage
         # variables
         self._manipulator_prim_path = "/World/tableScaled/Manipulators/"
         self._manipulator_asset_path = "./assets/robots/"
@@ -125,9 +126,15 @@ class ROS2Interface(Node):
                     matrix = convert_position_orientation_to_matrix(pos, quat, scale=1.0)
                     transform_prim(prim_path, matrix)
 
-                usd_prim = self._stage.GetPrimAtPath(prim_path + "/ActionGraph/ros2_subscribe_joint_state")
-                print(usd_prim.GetAttribute("inputs:nodeNamespace"))
-                usd_prim.GetAttribute("inputs:nodeNamespace").Set(manipulator["name"])
+                usd_prim = omni.usd.get_context().get_stage().GetPrimAtPath(prim_path + "/ActionGraph/ros2_subscribe_joint_state")
+                    print(usd_prim)
+                    print(usd_prim.GetAttribute("inputs:nodeNamespace").Get())
+
+                    attribute = usd_prim.GetAttribute("inputs:nodeNamespace")
+
+                    attribute.Set(manipulator["name"])  # f'/{manipulator["name"]}')
+                except Exception as e:
+                    print(e)
                 self._manipulators_to_spawn.remove(manipulator)
         if self._manipulators_to_delete:
             for manipulator in self._manipulators_to_delete:
