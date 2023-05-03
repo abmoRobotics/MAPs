@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionServer
+from rclpy.action.server import ActionServer
 from robot_actions.action import Man
 
 from sensor_msgs.msg import JointState
@@ -67,8 +67,7 @@ class Manipulator(Node):
                                                     topic_prefix=name, 
                                                     callback_type=self.action_mani_callback, 
                                                     n_robots=1))
-            
-        print(self.action_server)
+        
 
         # Define callback timer
         timer_period = 0.1  # seconds
@@ -102,21 +101,28 @@ class Manipulator(Node):
 
             self.new_goal = False
             print("New goal is: " + str(self.new_goal))
-        
-            
-            # for idx, publisher in enumerate(self.publisher_array):
-            #     print("HEKKK" + str(self.pos[idx][-1]))
-            #     self.pos[idx] = self.pos[idx][-1]
-            #     self.vel[idx] = self.vel[idx][-1]
-            #     #print(self.pos)
-            #     #print(self.vel)
+
 
         
-    def action_mani_callback(self):
+    def action_mani_callback(self, goal_handle):
 
 
-        msg = Manipulator.goal_feedback()
-        pass
+        f_msg = Man.Feedback()
+        f_msg.goalfeedback = "Running"
+
+        
+        self.get_logger().info("Goal request" + str(goal_handle.request.goal))
+
+        self.get_logger().info('Feedback: {0}'.format(f_msg.goalfeedback))
+        goal_handle.publish_feedback(f_msg)
+        time.sleep(1)
+
+        goal_handle.succeed()
+
+        result = Man.Result()
+        result.goalresult = " Done running"
+
+        return result
 
 
 def main(args=None):
