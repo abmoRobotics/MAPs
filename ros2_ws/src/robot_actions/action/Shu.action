@@ -1,5 +1,5 @@
-int32 goal
+float64[] goal
 ---
-int32[] goalresult
+string goalresult
 ---
-int32[] goalfeedback
+string goalfeedback
