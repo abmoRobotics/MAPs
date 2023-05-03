@@ -67,6 +67,8 @@ class Shuttle(Node):
             msg = self.mode.move(pos, vel)
             publisher.publish(msg)
 
+    def action_shuttle_callback(self, goal_handle):
+        pass
      
 
 
