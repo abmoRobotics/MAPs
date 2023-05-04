@@ -1,0 +1,12 @@
+shuttle:
+  ros__parameters:
+    num_of_shuttles: 5
+    shuttle1_position: [0.0,0.0,0.0]
+    shuttle2_position: [0.0,3.0,0.0]
+    shuttle3_position: [1.0,0.0,0.0]
+    shuttle4_position: [1.0,0.0,0.0]
+    shuttle5_position: [1.0,0.0,0.0]
+manipulator:
+  ros__parameters:
+    num_of_manipulators: 1
+    manipulator1_position: [0.0,0.0,0.0]
