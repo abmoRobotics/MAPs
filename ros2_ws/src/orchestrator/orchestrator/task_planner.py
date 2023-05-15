@@ -1,99 +1,104 @@
-import requests
-import pandas as pd
+import rclpy
+from rclpy.node import Node
 import numpy as np
+from math import pi
 
-ip = "0.0.0.0"
-port = "5000"
-url = "http://" + ip + ":" + port + "/cuopt/"
+from robot_actions.action import Man
+from robot_actions.action import Shu
 
-data_params = {"return_data_state": False}
-
-
-def show_results(res):
-    print("\n====================== Response ===========================\n")
-    print("Solver status: ", res["status"])
-    if res["status"] == 0:
-        print("Cost         : ", res["solution_cost"])
-        print("Vehicle count: ", res["num_vehicles"])
-        for veh_id in res["vehicle_data"].keys():
-            print("\nVehicle ID: ", veh_id)
-            print("----------")
-            print("Tasks assigned: ", res["vehicle_data"][veh_id]["task_id"])
-            data = res["vehicle_data"][veh_id]
-            routes_and_types = {key:data[key] for key in ["route", "type"]}
-            print("Route: \n", pd.DataFrame(routes_and_types))
-    else:
-        print("Error: ", res["error"])
-    print("\n======================= End ===============================\n")
-
-way_point_graph = {
-    "waypoint_graph": {
-        "0": {
-            "offsets": [0,       3,    5,           9,    11,   13,   15,   17, 18, 19, 20, 21], # noqa
-            "edges":   [1, 2, 9, 0, 7, 0, 3, 4, 10, 2, 4, 2, 5, 6, 9, 5, 8, 1,  6,  0,  5], # noqa
-            "weights": [1, 1, 2, 1, 2, 1, 1, 1,  3, 2, 3, 2, 1, 2, 1, 3, 4, 2,  3,  1,  1]  # noqa
-        }}}
-
-print(way_point_graph)
-matrix_response = requests.post(
-    url + "set_cost_waypoint_graph", params=data_params, json=way_point_graph
-)
-print(f"\nWAYPOINT GRAPH ENDPOINT RESPONSE: {matrix_response.json()}\n")
-
-fleet_data = {
-    "vehicle_locations": [[0, 0], [1, 1], [0, 1], [1, 0], [0, 0]],
-    "capacities": [[10, 12, 15, 8, 10]],
-    "vehicle_time_windows": [[0, 80], [1, 40], [3, 30], [5, 80], [20, 100]],
-}
-
-fleet_response = requests.post(
-    url + "set_fleet_data", params=data_params, json=fleet_data
-)
-print(f"FLEET ENDPOINT RESPONSE: {fleet_response.json()}\n")
-
-task_data = {
-    "task_locations": [0, 1, 3, 4, 6, 8],
-    "demand": [[0, 3, 4, 4, 3, 2]],
-    "task_time_windows": [
-        [0, 1000],
-        [3, 20],
-        [5, 30],
-        [1, 20],
-        [4, 40],
-        [0, 30],
-    ],
-    "service_times": [0, 3, 1, 8, 4, 0],
-}
-
-task_response = requests.post(
-    url + "set_task_data", params=data_params, json=task_data
-)
-
-print(f"TASK ENDPOINT RESPONSE: {task_response.json()}\n")
-
-solver_config = {"time_limit": 0.01, "number_of_climbers": 128}
-
-solver_config_response = requests.post(
-    url + "set_solver_config", params=data_params, json=solver_config
-)
-print(f"SOLVER CONFIG ENDPOINT RESPONSE: {solver_config_response.json()}\n")
+from utils import create_action_client_array
+from utils import KR4R600, KR3R540
 
 
-solve_parameters = {
-    # Uncomment to disable/ignore constraints.
-
-    # "ignore_capacities": True,
-    # "ignore_vehicle_time_windows": True,
-    # "ignore_vehicle_break_time_windows": True,
-    # "ignore_task_time_windows": True,
-    # "ignore_pickup_and_delivery": True,
-    "return_status": False,
-    "return_data_state": False,
-}
 
 
-solver_response = requests.get(
-    url + "get_optimized_routes", params=solve_parameters
-)
-print(f"SOLVER RESPONSE: {solver_response.json()}\n")
-show_results(solver_response.json()["response"]["solver_response"])
+class TaskPlanner(Node):
+
+    def __init__(self):
+        super().__init__('task_planner')
+        # Define publishers and messages
+
+        number_of_kuka540 = 2
+        number_of_kuka600 = 2
+
+        self.number_of_shuttels = 5 * ["Shuttle"]
+
+        name540 = number_of_kuka540 * [KR3R540()._name]
+        name600 = number_of_kuka600 * [KR4R600()._name]
+
+        self.name_of_manipulators = np.concatenate((name600, name540))
+
+
+        goal = [0, -pi/2, pi/2, 0, 0, 0]
+
+        for idx, name in enumerate(self.name_of_manipulators):
+            self.ManiActionClient = create_action_client_array(self, 
+                                                               Man, 
+                                                               topic_prefix=name,
+                                                               n_robots=1) 
+            
+        for idx, name in enumerate(self.number_of_shuttels):
+            self.ShuActionClient = create_action_client_array(self,
+                                                              Shu,
+                                                              topic_prefix=name,
+                                                              n_robots=1
+                                                              )
+
+    def Man_send_goal(self, goal):
+        # Function that send the goal for multiple manipulators
+        goal_msg = Man.Goal()
+        goal_msg.goal = goal
+
+        for idx, Client in enumerate(self.ManiActionClient):
+            self.ManiActionClient[idx].wait_for_server()
+            future = self.ManiActionClient[idx].send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
+            future.add_done_callback(self.goal_response_callback) 
+
+
+    def Shu_send_goal(self, goal):
+        # Function that send the goal for multiple shuttles
+        goal_msg = Shu.Goal()
+        goal_msg.goal = goal
+
+        for idx, Client in enumerate(self.ShuActionClient):
+            self.ShuActionClient[idx].wait_for_server()
+            future = self.ShuActionClient[idx].send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
+            future.add_done_callback(self.goal_response_callback) 
+
+
+    
+    def goal_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().info('Goal rejected :(')
+            return
+
+        self.get_logger().info('Goal accepted :)')
+
+        self._get_result_future = goal_handle.get_result_async()
+        self._get_result_future.add_done_callback(self.get_result_callback)
+
+    def get_result_callback(self, future):
+        result = future.result().result
+        self.get_logger().info('Result: {0}'.format(result.goalresult))
+        rclpy.shutdown()
+
+    def feedback_callback(self, feedback_msg):
+        feedback = feedback_msg.feedback
+        self.get_logger().info('Received feedback: {0}'.format(feedback.goalfeedback))
+
+
+
+def main(args=None):
+    """Initializes the Manipulator node and spins it until it is destroyed."""
+    rclpy.init(args=args)
+
+    task_node = TaskPlanner()
+
+    goal = [0.0, -pi/2, pi/2, 0.0, 0.0, 0.0]
+
+    task_node.Man_send_goal(goal)
+    rclpy.spin(task_node)
+
+if __name__ == '__main__':
+    main()

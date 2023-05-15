@@ -1,0 +1,37 @@
+{
+  //   "files.associations": {
+  //     "*.kit": "toml"
+  //   },
+  //   "editor.rulers": [500],
+
+  //   // Python modules search paths:
+  //   "python.analysis.extraPaths": [],
+
+  //   // Python & Pylance Setup
+  //   "python.languageServer": "Pylance",
+  //   "python.pythonPath": "${workspaceFolder}/app/kit/python/bin/python3",
+  //   "python.defaultInterpreterPath": "${workspaceFolder}/app/kit/python/bin/python3",
+
+  //   // We use "black" as a formatter:
+  //   "python.formatting.provider": "autopep8",
+  //   //"python.formatting.blackArgs": ["--line-length", "500"],
+
+  //   // Use flake8 for linting
+  //   //   "python.linting.enabled": true,
+  //   //   "python.linting.pylintEnabled": true,
+  //   //   "python.linting.flake8Enabled": true,
+  //   "python.linting.flake8Args": [
+  //     "--ignore=F403,F401,D107,D102",
+  //     "--max-line-length=500"
+  //   ],
+  //   "python.linting.pep8Enabled": true
+  //   //"python.formatting.provider": "autopep8",
+  "python.pythonPath": "${workspaceFolder}/backend/env/bin/python3",
+  "python.venvPath": "${workspaceFolder}/backend/env",
+  "python.linting.flake8Enabled": false,
+  "python.linting.flake8Path": "flake8",
+  "python.linting.flake8Args": ["--ignore", "E501"],
+  "python.linting.pylintEnabled": false,
+  "python.linting.pylintPath": "pylint",
+  "python.linting.pylintArgs": ["--load-plugins", "pylint_django"]
+}
