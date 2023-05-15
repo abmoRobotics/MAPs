@@ -16,8 +16,11 @@ def generate_launch_description():
     shuttle = LaunchConfiguration('sim_shuttle')
     no_shuttles = LaunchConfiguration('number_of_shuttles')
     manipulator = LaunchConfiguration('sim_manipulator')
-    no_manipulators = LaunchConfiguration('number_of_manipulators')
-    #physical = LaunchConfiguration('use_physical_setup')
+    no_manipulators = LaunchConfiguration('num_of_manipulators')
+    no_table = LaunchConfiguration('number_of_tabels')
+    manipulator_position = LaunchConfiguration('manipulator_position')
+    table_position = LaunchConfiguration('table_position')
+    
 
     config = os.path.join(
       get_package_share_directory('orchestrator'),
@@ -63,8 +66,32 @@ def generate_launch_description():
     )
     
     num_of_manipulators_launch_arg = DeclareLaunchArgument(
-        'number_of_manipulators',
+        'num_of_manipulators',
         description="This will decalare the number of manipulators you want to the tabel.",
+        default_value="6"
+    )
+
+    num_of_tabels_launch_arg = DeclareLaunchArgument(
+        'num_of_tabels',
+        description="This will decalare the number of tabels you want.",
+        default_value="6"
+    )
+
+    manipulator_position_launch_arg = DeclareLaunchArgument(
+        'manipulator_position',
+        description="This will decalare the nmanipulators position.",
+        default_value="5"
+    )
+
+    table_position_launch_arg = DeclareLaunchArgument(
+        'table_position',
+        description="This will decalare the number of tabels you want.",
+        default_value="6"
+    )
+
+    num_of_tabels_launch_arg = DeclareLaunchArgument(
+        'number_of_tabels',
+        description="This will decalare the number of tabels you want.",
         default_value="6"
     )
 
@@ -106,7 +133,10 @@ def generate_launch_description():
         emulate_tty=True,
         parameters=[config,
                     {"num_of_shuttles":no_shuttles},
-                    {"num_of_manipulators":no_manipulators}
+                    {"num_of_manipulators":no_manipulators},
+                    {"num_of_tabels":no_table},
+                    {"table_position":table_position},
+                    {"robot_position":manipulator_position} 
                     ]
     )
 
@@ -115,12 +145,14 @@ def generate_launch_description():
         gui_launch_arg,
         isaac_sim_launch_arg,
         shuttle_launch_arg,
-        manipulator_launch_arg,
-        physical_launch_arg,
+        # manipulator_launch_arg,
         num_of_shuttle_launch_arg,
         num_of_manipulators_launch_arg,
-        shuttle_node,
-        gui_node,
+        manipulator_position_launch_arg,
+        num_of_tabels_launch_arg,
+        table_position_launch_arg,
+        #shuttle_node,
+        gui_node
 
         # RegisterEventHandler(
         #     OnShutdown(
