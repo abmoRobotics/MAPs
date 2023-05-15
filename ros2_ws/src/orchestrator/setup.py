@@ -26,7 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'shuttle = orchestrator.shuttle:main',
-            'gui = orchestrator.gui:main',
+            'gui = orchestrator.pyside_gui:main',
             'manipulator = orchestrator.manipulator:main',
             'task_planner = orchestrator.task_planner:main'
         ],
