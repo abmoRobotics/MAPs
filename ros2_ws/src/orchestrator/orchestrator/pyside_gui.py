@@ -18,7 +18,9 @@ class Pos(QWidget):
 
     shuttle = Signal(int)
     robot = Signal(int)
-    default = Signal(int)
+    default_robot = Signal(int)
+    default_shuttle = Signal(int)
+
 
     def __init__(self, x, y, *args, **kwargs):
         super(Pos, self).__init__(*args, **kwargs)
@@ -30,7 +32,9 @@ class Pos(QWidget):
 
         self.draw_robot_img = False
         self.draw_shuttle_img = False
-        self.draw_default_img = False
+        self.draw_default_robot = False
+        self.draw_default_shuttle = False
+        
 
     def paintEvent(self, event):
         p = QPainter(self)
@@ -39,36 +43,55 @@ class Pos(QWidget):
         p.drawRect(r)
 
         # Draw robot
-        if self.draw_robot_img: 
+        if self.draw_robot_img and not self.draw_shuttle_img: 
             p.fillRect(r,QBrush(Qt.gray))
-            self.draw_default_img = False
+            print("Position robot: ", self.x, self.y)
+            self.draw_default_shuttle = False
+            self.draw_default_robot = False
+            self.draw_shuttle_img = False
 
         # Draw shuttle
-        if self.draw_shuttle_img:
+        if self.draw_shuttle_img and not self.draw_robot_img:
             p.fillRect(r,QBrush(Qt.black))
-            self.draw_default_img = False
+            print("Position shuttle: ", self.x, self.y)
+            self.draw_default_robot = False
+            self.draw_default_shuttle = False
+            self.draw_robot_img = False
 
         # Reset robot or shuttle
-        if self.draw_default_img:
+        if self.draw_default_robot:
             p.eraseRect(r)
-            self.draw_shuttle_img = False
+            p.drawRect(r)
             self.draw_robot_img = False
             self.update()
 
+        if self.draw_default_shuttle:
+            p.eraseRect(r)
+            p.drawRect(r)
+            self.draw_shuttle_img = False
+            self.update()
+
+
     def mouseReleaseEvent(self, e):
 
-        if (e.button() == Qt.RightButton) and self.draw_robot_img or (e.button() == Qt.LeftButton) and self.draw_shuttle_img:
-            self.draw_default = True
+        if (e.button() == Qt.RightButton) and self.draw_robot_img:
             self.draw_robot_img = False
+            self.draw_default_robot = True
+            self.default_robot.emit(1)
+
+        elif (e.button() == Qt.LeftButton) and self.draw_shuttle_img:
             self.draw_shuttle_img = False
-            self.default.emit(1)
+            self.draw_default_shuttle = True
+            self.default_shuttle.emit(1)
 
         elif (e.button() == Qt.RightButton):
             self.draw_robot_img = True
+            self.draw_default_robot = False
             self.robot.emit(1)
 
         elif (e.button() == Qt.LeftButton):
             self.draw_shuttle_img = True
+            self.draw_default_shuttle = False
             self.shuttle.emit(1)
 
         
@@ -90,6 +113,9 @@ class Grid(QGridLayout):
         self.setSpacing(0)
         self.width = input_width
         self.lenght = input_lenght
+
+        self.num_robot = 0
+        self.num_shuttle = 0
 
         self.setSizeConstraint(QLayout.SetFixedSize)
         self.shuttle = False
@@ -115,18 +141,31 @@ class Grid(QGridLayout):
                 self.w = Pos(x, y)
                 self.w.robot.connect(self.draw_robot)
                 self.w.shuttle.connect(self.draw_shuttle)
-                self.w.default.connect(self.draw_default)
+                self.w.default_robot.connect(self.draw_default_robot_img)
+                self.w.default_shuttle.connect(self.draw_default_shuttle_img)
                 self.addWidget(self.w,y,x)
     
     def draw_robot(self):
+        self.num_robot += 1
+        print("Number of robot:", self.num_robot)
         self.draw_robot_img = True
 
     def draw_shuttle(self):
+        self.num_shuttle += 1
+        print("Number of tables:", self.num_shuttle)
         self.draw_shuttle_img = True
 
-    def draw_default(self):
-        print("I am defalut now")
-        self.draw_default_img = True
+    def draw_default_robot_img(self):
+        self.num_robot -= 1
+        print("Number of robot:", self.num_robot)
+        print("I am default robot now")
+        self.draw_default_robot = True
+
+    def draw_default_shuttle_img(self):
+        self.num_shuttle -= 1
+        print("Number of tables:", self.num_shuttle)
+        print("I am default shuttle now")
+        self.draw_default_shuttle = True
 
 
 class MainWindow(QMainWindow):
