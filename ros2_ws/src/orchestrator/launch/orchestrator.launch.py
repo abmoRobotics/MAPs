@@ -17,7 +17,7 @@ def generate_launch_description():
     no_shuttles = LaunchConfiguration('number_of_shuttles')
     manipulator = LaunchConfiguration('sim_manipulator')
     no_manipulators = LaunchConfiguration('number_of_manipulators')
-    physical = LaunchConfiguration('use_physical_setup')
+    #physical = LaunchConfiguration('use_physical_setup')
 
     config = os.path.join(
       get_package_share_directory('orchestrator'),

@@ -2,6 +2,9 @@ import sys
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
+import rclpy
+from rclpy.parameter import Parameter
+from rclpy.node import Node
 
 
 class Color(QWidget):
@@ -34,6 +37,9 @@ class Pos(QWidget):
         self.draw_shuttle_img = False
         self.draw_default_robot = False
         self.draw_default_shuttle = False
+
+        self.robot_position = []
+        self.table_position = []
         
 
     def paintEvent(self, event):
@@ -46,6 +52,8 @@ class Pos(QWidget):
         if self.draw_robot_img and not self.draw_shuttle_img: 
             p.fillRect(r,QBrush(Qt.gray))
             print("Position robot: ", self.x, self.y)
+            self.robot_position.append([self.x, self.y])
+            Parameter('robot_position',Parameter.Type.INTEGER_ARRAY,self.robot_position)
             self.draw_default_shuttle = False
             self.draw_default_robot = False
             self.draw_shuttle_img = False
@@ -54,6 +62,8 @@ class Pos(QWidget):
         if self.draw_shuttle_img and not self.draw_robot_img:
             p.fillRect(r,QBrush(Qt.black))
             print("Position shuttle: ", self.x, self.y)
+            self.table_position.append([self.x, self.y])
+            Parameter('table_position',Parameter.Type.INTEGER_ARRAY,self.table_position)
             self.draw_default_robot = False
             self.draw_default_shuttle = False
             self.draw_robot_img = False
@@ -113,9 +123,20 @@ class Grid(QGridLayout):
         self.setSpacing(0)
         self.width = input_width
         self.lenght = input_lenght
+        rclpy.init()
+        self.gui = Node("Gui")
 
-        self.num_robot = 0
-        self.num_shuttle = 0
+        self.gui.declare_parameter('num_of_manipulators', 5)
+        self.gui.declare_parameter('num_of_tabels', 5)
+
+        self.num_robot =  self.gui.get_parameter('num_of_manipulators').get_parameter_value().integer_value
+        self.num_shuttle = self.gui.get_parameter('num_of_tabels').get_parameter_value().integer_value
+
+        self.robot_position = []
+        self.table_position = []
+        
+        self.gui.declare_parameter('robot_position', self.robot_position)
+        self.gui.declare_parameter('table_position', self.table_position)
 
         self.setSizeConstraint(QLayout.SetFixedSize)
         self.shuttle = False
@@ -147,24 +168,26 @@ class Grid(QGridLayout):
     
     def draw_robot(self):
         self.num_robot += 1
+        Parameter('num_of_manipulators',Parameter.Type.INTEGER,self.num_robot)
         print("Number of robot:", self.num_robot)
         self.draw_robot_img = True
 
     def draw_shuttle(self):
         self.num_shuttle += 1
+        Parameter('num_of_tabels',Parameter.Type.INTEGER,self.num_shuttle)
         print("Number of tables:", self.num_shuttle)
         self.draw_shuttle_img = True
 
     def draw_default_robot_img(self):
         self.num_robot -= 1
+        Parameter('num_of_manipulators',Parameter.Type.INTEGER,self.num_robot)
         print("Number of robot:", self.num_robot)
-        print("I am default robot now")
         self.draw_default_robot = True
 
     def draw_default_shuttle_img(self):
         self.num_shuttle -= 1
+        Parameter('num_of_tabels',Parameter.Type.INTEGER,self.num_shuttle)
         print("Number of tables:", self.num_shuttle)
-        print("I am default shuttle now")
         self.draw_default_shuttle = True
 
 
