@@ -2,7 +2,10 @@ from launch_ros.actions import Node
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler, ExecuteProcess
 from launch.substitutions import LaunchConfiguration
+from launch.actions import IncludeLaunchDescription
 from ament_index_python.packages import get_package_share_directory
+from launch_ros.substitutions import FindPackageShare
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 from utils import save_yaml
 from launch.event_handlers import (OnExecutionComplete, OnProcessExit,
@@ -14,10 +17,19 @@ def generate_launch_description():
     gui = LaunchConfiguration('gui')
     isaac_sim = LaunchConfiguration('isaac_sim')
     shuttle = LaunchConfiguration('sim_shuttle')
-    no_shuttles = LaunchConfiguration('number_of_shuttles')
+    no_shuttles = LaunchConfiguration('num_of_shuttles')
     manipulator = LaunchConfiguration('sim_manipulator')
-    no_manipulators = LaunchConfiguration('number_of_manipulators')
-    physical = LaunchConfiguration('use_physical_setup')
+    no_manipulators = LaunchConfiguration('num_of_manipulators')
+    no_table = LaunchConfiguration('number_of_tabels')
+    manipulator_position = LaunchConfiguration('manipulator_position')
+    table_position = LaunchConfiguration('table_position')
+
+    global_parameters = os.path.join(
+        get_package_share_directory('acopos_bringup'),
+        'config',
+        'global_params.yaml'
+    )
+    
 
     config = os.path.join(
       get_package_share_directory('orchestrator'),
@@ -57,14 +69,38 @@ def generate_launch_description():
         choices=['True', 'False']
     )
     num_of_shuttle_launch_arg = DeclareLaunchArgument(
-        'number_of_shuttles',
+        'num_of_shuttles',
         description="This will decalare the number of shuttles you want on the tabel.",
         default_value="5"
     )
     
     num_of_manipulators_launch_arg = DeclareLaunchArgument(
-        'number_of_manipulators',
+        'num_of_manipulators',
         description="This will decalare the number of manipulators you want to the tabel.",
+        default_value="6"
+    )
+
+    num_of_tabels_launch_arg = DeclareLaunchArgument(
+        'num_of_tabels',
+        description="This will decalare the number of tabels you want.",
+        default_value="6"
+    )
+
+    manipulator_position_launch_arg = DeclareLaunchArgument(
+        'manipulator_position',
+        description="This will decalare the nmanipulators position.",
+        default_value="5"
+    )
+
+    table_position_launch_arg = DeclareLaunchArgument(
+        'table_position',
+        description="This will decalare the number of tabels you want.",
+        default_value="6"
+    )
+
+    num_of_tabels_launch_arg = DeclareLaunchArgument(
+        'number_of_tabels',
+        description="This will decalare the number of tabels you want.",
         default_value="6"
     )
 
@@ -105,22 +141,32 @@ def generate_launch_description():
         output="screen",
         emulate_tty=True,
         parameters=[config,
+                    global_parameters,
                     {"num_of_shuttles":no_shuttles},
-                    {"num_of_manipulators":no_manipulators}
+                    {"num_of_manipulators":no_manipulators},
+                    {"num_of_tabels":no_table},
+                    {"table_position":table_position},
+                    {"robot_position":manipulator_position} 
                     ]
     )
 
 
     return LaunchDescription([
+        IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+                    FindPackageShare("acopos_bringup"), '/launch', '/acopos.launch.py'])
+        ),
         gui_launch_arg,
         isaac_sim_launch_arg,
         shuttle_launch_arg,
-        manipulator_launch_arg,
-        physical_launch_arg,
+        # manipulator_launch_arg,
         num_of_shuttle_launch_arg,
         num_of_manipulators_launch_arg,
-        shuttle_node,
+        manipulator_position_launch_arg,
+        num_of_tabels_launch_arg,
+        table_position_launch_arg,
         gui_node,
+        shuttle_node
 
         # RegisterEventHandler(
         #     OnShutdown(

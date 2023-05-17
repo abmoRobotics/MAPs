@@ -1,0 +1,7 @@
+gui:
+  ros__parameters:
+    num_of_shuttles: 8
+    num_of_manipulators: 0
+    num_of_tabels: 0
+    robot_position: [0.0]
+    table_position: [0.0]

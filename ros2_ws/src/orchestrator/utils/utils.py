@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # utils.py
 from rclpy.node import Node
+from rclpy.action import ActionServer
+from rclpy.action import ActionClient
 import yaml
 import numpy as np
 import os
@@ -145,3 +147,50 @@ def save_yaml(self):
     print(yaml_output)
     with open(os.path.join("", "tester3" + '.yaml'), 'w') as yaml_file:
         yaml.dump(yaml_output, yaml_file, default_flow_style=False)
+
+
+def create_action_server_array(node: Node, action_type: type, topic_prefix: str, callback_type: type, n_robots: int):
+    """
+    Create a list of ROS action servers for a given number of robots.
+
+    :param node: The ROS Node object that will be used to create the action.
+    :type node: Node
+
+    :param action_type: The type of action that is asigned for the robot 
+    :type action_type: type
+
+    :param n_robots: The number of servers to create.
+    :type n_robots: int
+
+    :returns: A list of ROS publishers created by the given node for each robot, with the topic name and index based on the robot number.
+    :rtype: List[Publisher]
+    """
+    action_servers = []
+    for i in range(n_robots):
+        node.get_logger().info('created action server: ' + topic_prefix + str(i))
+        node.get_logger().info('n_robots: ' + str(topic_prefix))
+        action_servers.append(ActionServer(node, action_type, topic_prefix + str(i), callback_type))
+    return action_servers
+
+def create_action_client_array(node: Node, action_type: type, topic_prefix: str, n_robots: int):
+    """
+    Create a list of ROS action clients for a given number of robots.
+
+    :param node: The ROS Node object that will be used to create the action client.
+    :type node: Node
+
+    :param action_type: The type of action that is asigned for the robot 
+    :type action_type: type
+
+    :param n_robots: The number of clients to create.
+    :type n_robots: int
+
+    :returns: A list of ROS action clients created by the given node for each robot, with the topic prefic and index based on the robot number.
+    :rtype: List[Action Clients]
+    """
+    action_clients = []
+    for i in range(n_robots):
+        node.get_logger().info('created action: ' + topic_prefix + str(i))
+        node.get_logger().info('n_robots: ' + str(topic_prefix))
+        action_clients.append(ActionClient(node, action_type, topic_prefix + str(i)))
+    return action_clients
