@@ -7,6 +7,9 @@ from utils import ShuttleMode
 from sensor_msgs.msg import JointState
 import random
 import numpy as np
+from rcl_interfaces.srv import GetParameters
+from rcl_interfaces.msg import ParameterDescriptor, ParameterValue, Parameter
+from rclpy.parameter import ParameterType
 
 def generate_random_goals(num_shuttles):
     desired_positions = np.random.rand(num_shuttles, 2)
@@ -43,39 +46,45 @@ class Shuttle(Node):
                 )
                 self.set_parameters([param_value])
 
-        self.declare_parameter('num_of_shuttles')
+
         self.declare_parameter('sim_shuttle')
-        self.number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
         sim_shuttle = self.get_parameter('sim_shuttle').get_parameter_value().bool_value
-        self.get_logger().info('number of shuttles' + str(self.number_of_shuttles))
+        
+        # Define the number of shuttles that is from start
+        self.num_shu = 0
+        self.client = self.create_client(GetParameters,
+                                        '/global_parameter_server/get_parameters')
+
 
         if not sim_shuttle:
-            self.number_of_shuttles = 0
+            self.num_shu = 0
         else:
             joint_names = ['x_translation', 'y_translation', 'z_translation', 'x_rotation', 'y_rotation', 'z_rotation']
-            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
-            self.msg_array = create_joint_state_message_array(joint_names, self.number_of_shuttles)
+            self.publisher_array = create_publisher_array(self, self.num_shu, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
+            self.msg_array = create_joint_state_message_array(joint_names, self.num_shu)
 
         # Define callback timer
         timer_period = 5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.timer = self.create_timer(timer_period, self.shuttle_callback)
 
         self.mode = ShuttleMode()
 
+        
+
     def shuttle_callback(self):
-        try:
-            self.number_of_shuttles = self.get_parameter('num_of_shuttles').get_parameter_value().integer_value
-        except:
-            pass
-
-
+        
+        # Request parameter from the /gui node
+        request = GetParameters.Request()
+        request.names = ['num_of_shuttles']
+        future = self.client.call_async(request=request)
+        future.add_done_callback(self.callback_global_param)
 
         # Update the amout of topics that there need to be
-        if self.number_of_shuttles > len(self.publisher_array) or self.number_of_shuttles < len(self.publisher_array):
+        if self.num_shu> len(self.publisher_array) or self.num_shu < len(self.publisher_array):
             destroy_publisher_array(self, self.publisher_array)
-            self.publisher_array = create_publisher_array(self, self.number_of_shuttles, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
+            self.publisher_array = create_publisher_array(self, self.num_shu, topic_prefix=self.get_name(), topic_name='/joint_command', msg_type=JointState)
             self.get_logger().info("Old shuttels destroyed")
-        desired_positions = generate_random_goals(self.number_of_shuttles)
+        desired_positions = generate_random_goals(self.num_shu)
         for idx, publisher in enumerate(self.publisher_array):
             
             #pos = [0.06 + random.random()*0.84, 0.06 + random.random()*0.60, 0.0, 0.0, 0.0, 0.0]
@@ -87,6 +96,17 @@ class Shuttle(Node):
     def action_shuttle_callback(self, goal_handle):
         pass
      
+    def callback_global_param(self, future):
+        try:
+            result = future.result()
+        except Exception as e:
+            self.get_logger().warn("Service call failed inside shuttle %r" % (e,))
+        else:
+            self.param = result.values[0]
+            self.num_shu = self.param.integer_value
+            self.get_logger().info("Number of shuttle is: %s" % (self.num_shu,))
+
+
 
 
     
