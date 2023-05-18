@@ -28,7 +28,8 @@ setup(
             'shuttle = orchestrator.shuttle:main',
             'gui = orchestrator.pyside_gui:main',
             'manipulator = orchestrator.manipulator:main',
-            'task_planner = orchestrator.task_planner:main'
+            'task_planner = orchestrator.task_planner:main',
+            'spawn_manager = orchestrator.spawn_manager:main',
         ],
     },
 )

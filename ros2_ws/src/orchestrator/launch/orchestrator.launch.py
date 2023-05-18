@@ -150,6 +150,14 @@ def generate_launch_description():
                     ]
     )
 
+    spawn_node = Node(
+        package='orchestrator',
+        executable='spawn_manager',
+        name='spawn_manager',
+        output="screen",
+        emulate_tty=True,
+        parameters=[])
+
 
     return LaunchDescription([
         IncludeLaunchDescription(
@@ -165,6 +173,7 @@ def generate_launch_description():
         manipulator_position_launch_arg,
         num_of_tabels_launch_arg,
         table_position_launch_arg,
+        spawn_node,
         gui_node,
         shuttle_node
 
