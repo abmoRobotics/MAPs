@@ -124,6 +124,7 @@ def generate_launch_description():
         output="screen",
         emulate_tty=True,
         parameters=[config,
+                    global_parameters,
                     {"num_of_manipulators":no_manipulators},
                     {"sim_manipulators":manipulator}
                     ]
@@ -159,14 +160,15 @@ def generate_launch_description():
         gui_launch_arg,
         isaac_sim_launch_arg,
         shuttle_launch_arg,
-        # manipulator_launch_arg,
+        manipulator_launch_arg,
         num_of_shuttle_launch_arg,
         num_of_manipulators_launch_arg,
         manipulator_position_launch_arg,
         num_of_tabels_launch_arg,
         table_position_launch_arg,
         gui_node,
-        shuttle_node
+        shuttle_node,
+        manipulator_node
 
         # RegisterEventHandler(
         #     OnShutdown(
