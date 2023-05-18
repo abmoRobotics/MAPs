@@ -6,6 +6,7 @@ from robot_actions.action import Man
 from sensor_msgs.msg import JointState
 import numpy as np
 import time
+from rcl_interfaces.srv import GetParameters
 from spatialmath import SE3
 import roboticstoolbox as rtb
 import time
@@ -13,7 +14,8 @@ import time
 from utils import (create_joint_state_message_array, 
                     create_publisher_array, 
                     load_yaml_file,
-                    create_action_server_array)
+                    create_action_server_array,
+                    destroy_publisher_array)
 
 from utils import KR4R600, KR3R540
 
@@ -35,38 +37,42 @@ class Manipulator(Node):
                 )
                 self.set_parameters([param_value])
 
+        self.client = self.create_client(GetParameters,
+                                        '/global_parameter_server/get_parameters')
+        
+        # Request parameter from the /gui node
+        self.num_mani = 0
+
+
         self.kuka540 = KR3R540()
         self.kuka600 = KR4R600()
 
-        number_of_kuka540 = 2
-        number_of_kuka600 = 2
+    
+        name600 = self.num_mani * [self.kuka600._name]
 
-        name540 = number_of_kuka540 * [self.kuka540._name]
-        name600 = number_of_kuka600 * [self.kuka600._name]
-
-        self.name_of_manipulators = np.concatenate((name600, name540))
+        self.name_of_manipulators = name600
         self.publisher_array = []
         self.msg = []
         self.action_server = []
 
         self.manipulators = {'name': 'manipulator', 'position': [0, 0, 0] }
     
-        joint_names = ['joint0', 'joint1', 'joint2', 'joint3', 'joint4', 'joint5']
-        for idx, name in enumerate(self.name_of_manipulators):
-            self.publisher_array.append(create_publisher_array(self, 
-                                                                1,
-                                                                topic_prefix=name, 
-                                                                topic_name='/joint_command',
-                                                                msg_type=JointState))
-        
-            self.msg.append(create_joint_state_message_array(joint_names, 
-                                                                1))
-        
-            self.action_server.append(create_action_server_array(self, 
-                                                    Man, 
-                                                    topic_prefix=name, 
-                                                    callback_type=self.action_mani_callback, 
-                                                    n_robots=1))
+        self.joint_names = ['joint0', 'joint1', 'joint2', 'joint3', 'joint4', 'joint5']
+     
+        self.publisher_array = create_publisher_array(self, 
+                                                            self.num_mani,
+                                                            topic_prefix=self.kuka600._name, 
+                                                            topic_name='/joint_command',
+                                                            msg_type=JointState)
+    
+        self.msg = create_joint_state_message_array(self.joint_names, 
+                                                            self.num_mani)
+    
+        self.action_server = create_action_server_array(self, 
+                                                Man, 
+                                                topic_prefix=self.kuka600._name, 
+                                                callback_type=self.action_mani_callback, 
+                                                n_robots=self.num_mani)
         
 
         # Define callback timer
@@ -77,6 +83,33 @@ class Manipulator(Node):
         self.timer = self.create_timer(timer_period, self.mani_callback)
 
     def mani_callback(self):
+        
+        request = GetParameters.Request()
+        request.names = ['num_of_manipulators']
+        future = self.client.call_async(request=request)
+        future.add_done_callback(self.callback_global_param)
+
+        if self.num_mani > len(self.publisher_array) or self.num_mani < len(self.publisher_array):
+            self.get_logger().error("Number of manipulators is:" + str(self.num_mani))
+            destroy_publisher_array(self, self.publisher_array)
+            self.msg = []
+            self.action_server = []
+            
+            self.publisher_array = create_publisher_array(self, 
+                                                                self.num_mani,
+                                                                topic_prefix=self.kuka600._name, 
+                                                                topic_name='/joint_command',
+                                                                msg_type=JointState)
+        
+            self.msg = create_joint_state_message_array(self.joint_names, 
+                                                                self.num_mani)
+        
+            self.action_server = create_action_server_array(self, 
+                                                    Man, 
+                                                    topic_prefix=self.kuka600._name, 
+                                                    callback_type=self.action_mani_callback, 
+                                                    n_robots=self.num_mani)
+    
 
         if self.new_goal:
             for idx, publisher in enumerate(self.publisher_array):
@@ -94,10 +127,10 @@ class Manipulator(Node):
                 for idx, publisher in enumerate(self.publisher_array):
                     #print("SELF:POS: " + str(self.pos))
                     time.sleep(0.01) # Need to be removed
-                    self.msg[idx][0].position = self.pos[idx][idy]
-                    self.msg[idx][0].velocity = self.vel[idx][idy]
+                    self.msg[idx].position = self.pos[idx][idy]
+                    self.msg[idx].velocity = self.vel[idx][idy]
                     #print("INDI POS: " + str(self.pos[idy][idx]))
-                    publisher[0].publish(self.msg[idx][0])
+                    publisher.publish(self.msg[idx])
 
             self.new_goal = False
             print("New goal is: " + str(self.new_goal))
@@ -123,6 +156,16 @@ class Manipulator(Node):
         result.goalresult = " Done running"
 
         return result
+    
+    def callback_global_param(self, future):
+        try:
+            result = future.result()
+        except Exception as e:
+            self.get_logger().warn("Service call failed inside manipulator %r" % (e,))
+        else:
+            self.param = result.values[0]
+            self.num_mani = self.param.integer_value
+            # self.get_logger().info("Number of manipulators is: %s" % (self.num_mani,))
 
 
 def main(args=None):
