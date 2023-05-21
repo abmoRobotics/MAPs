@@ -4,6 +4,7 @@ from rclpy.node import Node
 
 from utils import create_joint_state_message_array, create_publisher_array, destroy_publisher_array, load_yaml_file, save_yaml
 from utils import ShuttleMode
+
 from sensor_msgs.msg import JointState
 import random
 import numpy as np
