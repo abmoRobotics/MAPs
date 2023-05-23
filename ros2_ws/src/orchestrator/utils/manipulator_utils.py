@@ -82,7 +82,7 @@ class KR4R600(DHRobot):
                     RevoluteDH(         alpha=-pi/2, d=-0.310,               qlim=[-185 * deg, 180 * deg]),
                     RevoluteDH(         alpha= pi/2,                         qlim=[-120 * deg, 120 * deg]),
                     RevoluteDH(                      d=-0.075,               qlim=[-350 * deg, 350 * deg])
-                ],  name = "KR_4_R600_",
+                ],  name = "KR4R600_",
                     manufacturer = "KUKA",
                     keywords=("dynamics", "symbolic", "mesh"),
                     symbolic=symbolic

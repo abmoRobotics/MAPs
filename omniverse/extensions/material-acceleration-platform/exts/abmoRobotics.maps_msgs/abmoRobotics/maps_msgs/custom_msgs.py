@@ -51,8 +51,10 @@ class ROS2Interface(Node):
     def __init__(self, msg_type):
         self._components = []
         super().__init__("tester_node")
-        self.srv = self.create_service(msg_type, "spawn_robot", self.spawn_robot)
-        self.srv = self.create_service(msg_type, "remove_robot", self.remove_robot)
+        self.srv = self.create_service(msg_type, "manipulator/add", self.spawn_robot)
+        self.srv = self.create_service(msg_type, "manipulator/remove", self.remove_robot)
+        self.srv = self.create_service(msg_type, "segment/add", self.spawn_segement)
+        self.srv = self.create_service(msg_type, "segment/remove", self.remove_segment)
 
         # omni objects and interfaces
         self._usd_context = omni.usd.get_context()
@@ -75,6 +77,12 @@ class ROS2Interface(Node):
         self._manipulators_to_delete = []
         self._manipulators = []
 
+        self._segments_prim_path = "/World/tableScaled/Segments/"
+        self._segments_asset_path = "./assets/usd/segment.usd"
+        self._segments_to_spawn = []
+        self._segments_to_delete = []
+        self._segments = []
+
     def spawn_robot(self, request, response):
         """SERVICE CALLBACK."""
         print(request)
@@ -92,11 +100,34 @@ class ROS2Interface(Node):
 
     def remove_robot(self, request, response):
         """SERVICE CALLBACK."""
-        self._manipulators_to_delete.append("test")
+        self._manipulators_to_delete.append({"name": request.name, "pose": request.pose})
         rate = self.create_rate(10)  # 10hz
+        print(self._manipulators_to_delete)
         while self._manipulators_to_delete:
             rate.sleep()
 
+        response.success = True
+
+        return response
+
+    def spawn_segement(self, request, response):
+        """Function to spawn a segment."""
+
+        self._segments_to_spawn.append({"name": request.name, "pose": request.pose})
+        rate = self.create_rate(10)  # 10hz
+        while self._segments_to_spawn:
+            rate.sleep()
+        response.success = True
+
+        return response
+
+    def remove_segment(self, request, response):
+        """Function to remove a segment."""
+
+        self._segments_to_delete.append({"name": request.name, "pose": request.pose})
+        rate = self.create_rate(10)
+        while self._segments_to_delete:
+            rate.sleep()
         response.success = True
 
         return response
@@ -127,20 +158,44 @@ class ROS2Interface(Node):
                     transform_prim(prim_path, matrix)
 
                 usd_prim = omni.usd.get_context().get_stage().GetPrimAtPath(prim_path + "/ActionGraph/ros2_subscribe_joint_state")
-                    print(usd_prim)
-                    print(usd_prim.GetAttribute("inputs:nodeNamespace").Get())
+                print(usd_prim)
+                print(usd_prim.GetAttribute("inputs:nodeNamespace").Get())
 
-                    attribute = usd_prim.GetAttribute("inputs:nodeNamespace")
+                attribute = usd_prim.GetAttribute("inputs:nodeNamespace")
 
-                    attribute.Set(manipulator["name"])  # f'/{manipulator["name"]}')
-                except Exception as e:
-                    print(e)
+                attribute.Set(manipulator["name"])  # f'/{manipulator["name"]}')
+                # except Exception as e:
+                #     print(e)
                 self._manipulators_to_spawn.remove(manipulator)
+
         if self._manipulators_to_delete:
             for manipulator in self._manipulators_to_delete:
-                self._stage.RemovePrim(self._manipulator_prim_path)
+                prim_path = self._manipulator_prim_path + manipulator["name"]
+                self._stage.RemovePrim(prim_path)
                 # delete_payload(context=self._usd_context, prim_path=self._manipulator_prim_path)
                 self._manipulators_to_delete.remove(manipulator)
+                print("deleted")
+
+        if self._segments_to_spawn:
+            for segment in self._segments_to_spawn:
+                prim_path = self._segments_prim_path + segment["name"]
+                asset_path = self._segments_asset_path
+                create_payload(context=self._usd_context, prim_path=prim_path, asset_path=asset_path)
+                position = segment["pose"].position
+                orientation = segment["pose"].orientation
+                pos = Gf.Vec3d(position.x, position.y, position.z)
+                quat = Gf.Quatd(orientation.w, orientation.x, orientation.y, orientation.z)
+                matrix = convert_position_orientation_to_matrix(pos, quat, scale=1.0)
+                transform_prim(prim_path, matrix)
+                self._segments_to_spawn.remove(segment)
+
+        if self._segments_to_delete:
+            for segment in self._segments_to_delete:
+                prim_path = self._segments_prim_path + segment["name"]
+                self._stage.RemovePrim(prim_path)
+                self._segments_to_delete.remove(segment)
+                print("deleted")
+
         # # print("ok")
 
     def _on_timeline_event(self, e: carb.events.IEvent):

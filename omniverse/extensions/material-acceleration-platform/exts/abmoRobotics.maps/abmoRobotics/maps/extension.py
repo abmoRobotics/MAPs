@@ -9,6 +9,7 @@ from .ros2.manager import RosManager
 import omni.ui as ui
 import omni.kit.commands
 import omni.usd
+from sensor_msgs.msg import JointState
 
 # import pxr.Usd
 # import pxr.Sdf
@@ -90,6 +91,7 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
         dt = time.perf_counter() - self.last_time
         self.last_time = time.perf_counter()
         fps = 1.0 / dt
+
         # print(f)
         if self.ros_started:
             if self.ros_manager.shuttles[0] is not None:
@@ -98,3 +100,13 @@ class AbmoroboticsMapsExtension(omni.ext.IExt):
                 rclpy.spin_once(joint_state_subscriber, timeout_sec=0.00000000000000001)
             for initial_pose_subscriber in self.ros_manager.initial_pose_subscribers:
                 rclpy.spin_once(initial_pose_subscriber, timeout_sec=0.00000000000000001)
+
+            velocities, positions, target_positions = self.ros_manager._get_current_shuttle_states()
+
+            for idx, joint_state_publisher in enumerate(self.ros_manager.joint_state_publisher):
+                joint_state = JointState()
+                joint_state.name.append(f"{idx}")
+                for i in range(3):
+                    joint_state.position.append(float(positions[idx][i]))
+                    joint_state.velocity.append(float(velocities[idx][i]))
+                joint_state_publisher.publish_joint_state(joint_state)
