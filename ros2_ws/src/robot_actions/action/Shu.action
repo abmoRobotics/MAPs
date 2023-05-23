@@ -1,5 +1,7 @@
+int32 id 
 float64[] goal
 ---
 string goalresult
+int32 id
 ---
 string goalfeedback

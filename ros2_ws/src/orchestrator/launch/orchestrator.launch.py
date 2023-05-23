@@ -177,7 +177,8 @@ def generate_launch_description():
         spawn_node,
         gui_node,
         shuttle_node,
-        manipulator_node
+        manipulator_node,
+        task_planner_node
 
         # RegisterEventHandler(
         #     OnShutdown(

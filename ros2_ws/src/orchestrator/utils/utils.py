@@ -55,6 +55,8 @@ def destroy_publisher_array(node: Node, publishers: int):
         node.destroy_publisher(publishers[i])
     return publishers
 
+
+
 def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointState:
     """
     Creates an array of JointState messages with the given number of messages and joint names.
@@ -76,6 +78,8 @@ def create_joint_state_message_array(joint_names: str, n_msgs: int) -> JointStat
         msg.effort = zero_array
         msgs.append(msg)
     return msgs
+
+
 
 def load_yaml_file(node_name: str) -> dict:
     config_path = os.path.join(
@@ -170,10 +174,10 @@ def create_action_server_array(node: Node, action_type: type, topic_prefix: str,
     for i in range(n_robots):
         node.get_logger().info('created action server: ' + topic_prefix + str(i))
         node.get_logger().info('n_robots: ' + str(topic_prefix))
-        action_servers.append(ActionServer(node, action_type, topic_prefix + str(i), callback_type))
+        action_servers.append(ActionServer(node, action_type, topic_prefix + str(f'{i:02}'), callback_type))
     return action_servers
 
-def create_action_client_array(node: Node, action_type: type, topic_prefix: str, n_robots: int):
+def create_action_client_array(node: Node, action_type: type, topic_prefix: str, callback, n_robots: int):
     """
     Create a list of ROS action clients for a given number of robots.
 
@@ -193,7 +197,7 @@ def create_action_client_array(node: Node, action_type: type, topic_prefix: str,
     for i in range(n_robots):
         node.get_logger().info('created action: ' + topic_prefix + str(i))
         node.get_logger().info('n_robots: ' + str(topic_prefix))
-        action_clients.append(ActionClient(node, action_type, topic_prefix + str(i)))
+        action_clients.append(ActionClient(node, action_type, topic_prefix + str(f'{i:02}', callback)))
     return action_clients
 
 

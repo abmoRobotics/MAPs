@@ -2,6 +2,7 @@ import rclpy
 import pxr.Usd as Usd
 import pxr.Sdf as Sdf
 from .subscribers import JointStateSubscriber, InitialPoseSubscriber
+from .publishers import JointStatePublisher
 from ..package.planar_motor import PlanarMotor
 import omni.usd
 import omni.kit.commands
@@ -13,6 +14,7 @@ class RosManager:
     def __init__(self) -> None:
         self.joint_state_subscribers: List[JointStateSubscriber] = []
         self.initial_pose_subscribers: List[InitialPoseSubscriber] = []
+        self.joint_state_publisher: List[JointStatePublisher] = []
         self.shuttles: List[PlanarMotor] = []
         self.shuttle_prefix = "/World/tableScaled/joints/shuttle_120x120_"  # Format _ + f'{idx:02}'
         self.stage = omni.usd.get_context().get_stage()
@@ -28,11 +30,15 @@ class RosManager:
     def reset_manager(self):
         self.joint_state_subscribers = []
         self.initial_pose_subscribers = []
+        self.joint_state_publisher = []
         self.shuttles = []
 
     def add_subscriber(self, topic, prim_path):
         self.joint_state_subscribers.append(JointStateSubscriber(topic, prim_path))
         self.initial_pose_subscribers.append(InitialPoseSubscriber(topic, prim_path))
+
+    def add_publisher(self, topic):
+        self.joint_state_publisher.append(JointStatePublisher(topic))
 
     def add_shuttle_prim(self, shuttle):
         self.shuttles.append(shuttle)
@@ -50,6 +56,7 @@ class RosManager:
                     planar_motor.spawn()
                     self.add_shuttle_prim(planar_motor)
                     self.add_subscriber(topic, planar_motor)
+                    self.add_publisher(f"shuttle{idx:02}/joint_states")
             else:
                 if prim.IsValid():
                     omni.kit.commands.execute("DeletePrims", paths=[Sdf.Path(f"{self.shuttle_prefix}{idx:02}")], destructive=False)
