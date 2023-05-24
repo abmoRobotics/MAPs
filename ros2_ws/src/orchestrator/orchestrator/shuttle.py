@@ -135,22 +135,34 @@ class Shuttle(Node):
         #self.get_logger().info(f'{self.shuttle_positions[shuttle_id]}')
         # self.get_logger().info(f'{np.linalg.norm(target_position[0:2] - self.shuttle_positions[shuttle_id])}')
         self.get_logger().info(f'action shuttle id {shuttle_id}, target position {target_position}')
-        while np.linalg.norm((target_position[0:2] - self.shuttle_positions[shuttle_id])) > 0.05:
-            self.get_logger().info(f'distance {np.linalg.norm((target_position[0:2] - self.shuttle_positions[shuttle_id]))}')
+        time_in_movement = 0.0
+        while np.linalg.norm((target_position[0:2] - self.shuttle_positions[shuttle_id])) > 0.15:
+            #self.get_logger().info(f'distance {np.linalg.norm((target_position[0:2] - self.shuttle_positions[shuttle_id]))}')
             #self.get_logger().info(f'current position {self.shuttle_positions[shuttle_id]}')
             #self.get_logger().info(f'target position {target_position[0:2]}')
             pos = [target_position[0], target_position[1], 0.0, 0.0, 0.0, 0.0]
             vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             msg = self.mode.move(pos, vel)
             self.publisher_array[shuttle_id].publish(msg)
-            time.sleep(0.1)
+            time.sleep(0.03)
+            time_in_movement +=0.03
         self.get_logger().info("goal reached sleeping")
-        time.sleep(5)
+        if target_position[0] == 0.1 and target_position[1] == 0.3:
+            time.sleep(2)
+            pos = [0.4, 0.4, 0.0, 0.0, 0.0, 0.0]
+            vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            msg = self.mode.move(pos, vel)
+            self.publisher_array[shuttle_id].publish(msg)
+        else:
+            time.sleep(6)
         self.get_logger().info("goal reached")
+
+        
 
         result = Shu.Result()
         result.goalresult = "Success"
         result.id = shuttle_id
+        result.time_in_movement = time_in_movement
 
         return result
 

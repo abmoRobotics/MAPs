@@ -57,8 +57,8 @@ class TaskPlanner(Node):
         self.client = self.create_client(GetParameters,
                                 '/global_parameter_server/get_parameters')
         
-        timer_period = 0.1  # seconds
-        self.timer = self.create_timer(timer_period, self.main_callback)
+        self.timer_period = 0.03  # seconds
+        self.timer = self.create_timer(self.timer_period, self.main_callback)
         print("Task planner initialized")
         self.value_id_manager_shuttle = ValueIDManager()
         self.value_id_manager_manipulator = ValueIDManager()
@@ -66,11 +66,38 @@ class TaskPlanner(Node):
         print("Task planner initialized")
         self.task_planner = TaskPlannerUtils()
 
-
+        self.time_elapsed = 0
+        self.time_in_movement = 0
+        self.utlility_of_station_time = 0
+        self.waiting_for_storage_time = 0
         self.shuttles_id_to_storage_station = []
         self.shuttles_waiting_for_storage = []
 
+
+        self.is_finished = False
+        self.timer_started = False
+
     def main_callback(self):
+        if self.timer_started:
+            if not self.is_finished: 
+                self.time_elapsed += 0.03
+                for shuttle_id in self.shuttles_waiting_for_storage:
+                    self.waiting_for_storage_time += 0.03
+
+                for station in self.task_planner.stations.get_stations():
+                    if station.get_availibility() == False:
+                        self.utlility_of_station_time += 0.03
+        if self.is_finished:
+            self.get_logger().info(f'Finished in {self.time_elapsed} seconds')
+            self.get_logger().info(f'Time waiting for storage {self.waiting_for_storage_time/self.number_of_shuttles} seconds')
+            number_of_stations = len(self.task_planner.stations.get_stations())
+            self.get_logger().info(f'Time waiting for station {self.utlility_of_station_time/number_of_stations} seconds')
+            self.get_logger().info(f'Time in movement {self.time_in_movement/self.number_of_shuttles} seconds')
+            self.get_logger().info(f'Percentage of time utility of station {((self.utlility_of_station_time/number_of_stations))/self.time_elapsed} %')
+            self.get_logger().info(f'Percentage of time waiting for storage {(self.waiting_for_storage_time/self.number_of_shuttles)/self.time_elapsed} %')
+            self.get_logger().info(f'Percentage of time utility of station v2 {((6*50)/number_of_stations)/self.time_elapsed} %')
+            self.get_logger().info(f'Percentage of time waiting for storage v2 {((2*50)/self.number_of_shuttles)/self.time_elapsed} %')
+            self.get_logger().info(f'Shuttle Utilization {((400) + self.time_in_movement)/self.time_elapsed} %')
         self.update_parameters_from_server()
         #self.print_parameters()
         #self.get_logger().info(f'task_planner {self.number_of_manipulators}')
@@ -88,9 +115,10 @@ class TaskPlanner(Node):
 
         #2. Get active tasks
         active_tasks = self.task_planner.get_active_tasks()
-        if active_tasks:
-            for idx, active_task in enumerate(active_tasks):
-                self.get_logger().info(f'active task idx{idx}:  {active_task.get_assigned_shuttle_id()}')
+        # if active_tasks:
+        #     for idx, active_task in enumerate(active_tasks):
+        #         self.get_logger().info(f'active task idx{idx}:  {active_task.get_assigned_shuttle_id()}')
+        
         #3. Move the shuttles to the assigned stations and wait for 3 seconds per add command 
         if active_tasks:
             for idx, active_task in enumerate(active_tasks):
@@ -114,11 +142,14 @@ class TaskPlanner(Node):
         
         if self.shuttles_id_to_storage_station:
             for shuttle_id in self.shuttles_id_to_storage_station:
-                goal = [0.1, 0.1, 0.0, 0.0, 0.0, 0.0]
+                goal = [0.1, 0.3, 0.0, 0.0, 0.0, 0.0]
                 self.send_goal_for_shuttles(goal, shuttle_id)
                 self.shuttles_id_to_storage_station.pop(0)
                 self.shuttles_waiting_for_storage.append(shuttle_id)
-
+        # 5. If no more tasks move to random position
+        if self.task_planner.get_tasks() == None:
+            if active_tasks == None:
+                self.is_finished = True
     
     def update_states(self):
         # self.get_logger().info(f'old number of manipulators {self.old_number_of_manipulators}')
@@ -150,11 +181,11 @@ class TaskPlanner(Node):
                 manipulator_id = list(self.value_id_manager_manipulator.id_to_value.keys())[-1]
             
             self.action_clients_manipulator.append(ActionClient(self,Man, KR4R600()._name + str(f'{manipulator_id:02}')))
-
+            self.timer_started = True
             ## Add station to task planner class
             station_position = self.find_closet_segment_to_manipulator(self.robot_position[manipulator_id])
             station = Station()
-            station.set_position(self.convert_to_xy(station_position)*0.24)
+            station.set_position((self.convert_to_xy(station_position)*0.24)-0.12)
             # print(station)
             # print(self.task_planner.stations)
             
@@ -291,18 +322,12 @@ class TaskPlanner(Node):
 
     def send_goal_for_shuttles(self, goal, id):
         # Function that send the goal for multiple shuttles
-        self.get_logger().info(f'inside send goal for shuttles {id}')
         goal_msg = Shu.Goal()
         goal_msg.id = id
         goal_msg.goal = goal
-        self.get_logger().info(f'debug #1')
         self.action_clients_shuttle[id].wait_for_server()
-        self.get_logger().info(f'debug #2')
         future = self.action_clients_shuttle[id].send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
-        self.get_logger().info(f'debug #3')
         future.add_done_callback(self.shuttle_goal_response_callback)
-        self.get_logger().info(f'debug #4')
-        self.get_logger().info(f'end of send goal for shuttles {id}')
 
     def shuttle_feedback_callback(self, feedback_msg):
         pass
@@ -324,7 +349,7 @@ class TaskPlanner(Node):
         result = future.result().result
         self.get_logger().info('Result: {0}'.format(result.id))
         #status = 'Goal succeeded!' if result.succes else 'Goal failed!'
-
+        self.time_in_movement += result.time_in_movement
         # 1. 
         active_tasks = self.task_planner.get_active_tasks()
         if active_tasks:
@@ -333,9 +358,9 @@ class TaskPlanner(Node):
                 if result.id == shuttle_id:
                     active_tasks.pop(idx)
                     self.shuttles_id_to_storage_station.append(shuttle_id)
-                    self.get_logger().info(f'active task idx {idx}:  {active_task.get_in_progress()}')
+                    #self.get_logger().info(f'active task idx {idx}:  {active_task.get_in_progress()}')
                     self.task_planner.free_station(active_task.get_assigned_station())
-                    self.get_logger().info(f'active task idx {idx}:  {active_task.get_in_progress()}')
+                    #self.get_logger().info(f'active task idx {idx}:  {active_task.get_in_progress()}')
 
         if self.shuttles_waiting_for_storage:
             for idx, shuttle_id in enumerate(self.shuttles_waiting_for_storage):

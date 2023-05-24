@@ -3,5 +3,6 @@ float64[] goal
 ---
 string goalresult
 int32 id
+float64 time_in_movement
 ---
 string goalfeedback

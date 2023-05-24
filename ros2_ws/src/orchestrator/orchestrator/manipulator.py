@@ -218,7 +218,7 @@ class Manipulator(Node):
 
     def transform_to_pose(self, pos):
         pos = str(pos)
-        x, y = pos.split('.')
+        y, x = pos.split('.')
         pose = Pose()
         pose.position.x = float(x)*0.18+0.12
         pose.position.y = float(y)*0.18+0.12

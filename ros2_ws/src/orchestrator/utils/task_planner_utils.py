@@ -107,7 +107,7 @@ class StationManager():
     def get_station_by_index(self, station_id: int) -> Station:
         return self.stations[station_id]
 
-    def get_stations(self):
+    def get_stations(self) -> List[Station]:
         return self.stations
     
     def set_status(self, station: Station, status: bool):
@@ -406,7 +406,7 @@ def create_fake_tasks():
 
     fake_tasks = [fake1_actions, fake2_actions, fake3_actions, fake4_actions, fake5_actions]
     
-    tasks = [task for task in fake_tasks for _ in range(20)]
+    tasks = [task for task in fake_tasks for _ in range(10)]
     random.shuffle(tasks)
 
     return tasks

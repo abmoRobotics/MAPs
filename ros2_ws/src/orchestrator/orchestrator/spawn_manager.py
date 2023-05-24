@@ -117,7 +117,7 @@ class SpawnManager(Node):
 
     def transform_to_pose(self, pos):
         pos = str(pos)
-        x, y = pos.split('.')
+        y, x = pos.split('.')
         pose = Pose()
         pose.position.x = -float(y)*0.24-0.2
         pose.position.y = float(x)*0.24+0.2
