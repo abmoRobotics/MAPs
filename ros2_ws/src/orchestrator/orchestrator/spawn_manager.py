@@ -119,8 +119,8 @@ class SpawnManager(Node):
         pos = str(pos)
         y, x = pos.split('.')
         pose = Pose()
-        pose.position.x = -float(y)*0.24-0.2
-        pose.position.y = float(x)*0.24+0.2
+        pose.position.x = -float(x)*0.24-0.2
+        pose.position.y = float(y)*0.24+0.2
         pose.position.z = float(0.9)
         pose.orientation.x = float(0)
         pose.orientation.y = float(0)

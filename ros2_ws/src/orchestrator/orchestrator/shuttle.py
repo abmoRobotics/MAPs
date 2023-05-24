@@ -147,9 +147,10 @@ class Shuttle(Node):
             time.sleep(0.03)
             time_in_movement +=0.03
         self.get_logger().info("goal reached sleeping")
-        if target_position[0] == 0.1 and target_position[1] == 0.3:
+        self.get_logger().info(f'action shuttle id {shuttle_id}, target position {target_position}')
+        if (target_position[0] == 0.12 and target_position[1] == 0.85) or (target_position[0] == 0.28 and target_position[1] == 0.9):
             time.sleep(2)
-            pos = [0.4, 0.4, 0.0, 0.0, 0.0, 0.0]
+            pos = [0.41, 0.52, 0.0, 0.0, 0.0, 0.0]
             vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             msg = self.mode.move(pos, vel)
             self.publisher_array[shuttle_id].publish(msg)

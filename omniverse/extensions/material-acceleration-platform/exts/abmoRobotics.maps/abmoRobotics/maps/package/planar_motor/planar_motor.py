@@ -57,6 +57,7 @@ class PlanarMotor(Manipulator):
         elif self.manipulator_index == 3:
             x = 90.0
             y = 90.0
+
         self.set_initial_transform(x=x, y=y, z=1.0)
         # self.set_initial_transform(x=20 * self.manipulator_index + 6.0, y=6.0, z=1.0)
 

@@ -66,6 +66,13 @@ class TaskPlanner(Node):
         print("Task planner initialized")
         self.task_planner = TaskPlannerUtils()
 
+
+        hand_over_station = Station()
+        hand_over_station.set_position(np.array([0.12,0.85]))
+        self.task_planner.hand_over_stations.add_station(hand_over_station)
+        hand_over_station2 = Station()
+        hand_over_station2.set_position(np.array([0.28,0.9]))
+        self.task_planner.hand_over_stations.add_station(hand_over_station2)
         self.time_elapsed = 0
         self.time_in_movement = 0
         self.utlility_of_station_time = 0
@@ -97,7 +104,7 @@ class TaskPlanner(Node):
             self.get_logger().info(f'Percentage of time waiting for storage {(self.waiting_for_storage_time/self.number_of_shuttles)/self.time_elapsed} %')
             self.get_logger().info(f'Percentage of time utility of station v2 {((6*50)/number_of_stations)/self.time_elapsed} %')
             self.get_logger().info(f'Percentage of time waiting for storage v2 {((2*50)/self.number_of_shuttles)/self.time_elapsed} %')
-            self.get_logger().info(f'Shuttle Utilization {((400) + self.time_in_movement)/self.time_elapsed} %')
+            self.get_logger().info(f'Shuttle Utilization {(((400) + self.time_in_movement)/self.time_elapsed)/self.number_of_shuttles} %')
         self.update_parameters_from_server()
         #self.print_parameters()
         #self.get_logger().info(f'task_planner {self.number_of_manipulators}')
@@ -139,18 +146,30 @@ class TaskPlanner(Node):
 
 
         #4. Move the shuttles to a random segment that is not a station and set shuttle to free
-        
+        hand_over_stations = self.task_planner.hand_over_stations.get_stations()
+       # self.get_logger().info(f'hand_over_stations: {hand_over_stations}')
         if self.shuttles_id_to_storage_station:
             for shuttle_id in self.shuttles_id_to_storage_station:
-                goal = [0.1, 0.3, 0.0, 0.0, 0.0, 0.0]
-                self.send_goal_for_shuttles(goal, shuttle_id)
-                self.shuttles_id_to_storage_station.pop(0)
-                self.shuttles_waiting_for_storage.append(shuttle_id)
+                if hand_over_stations:
+                    for hand_over_station in hand_over_stations:
+                        if hand_over_station.get_availibility() == True:
+                            hand_over_station.set_availibility(False)
+                            hand_over_station.set_assigned_shuttle_id(shuttle_id)
+                            station_position = hand_over_station.get_position()
+                            goal = [station_position[0], station_position[1], 0.0, 0.0, 0.0, 0.0]
+                            self.send_goal_for_shuttles(goal, shuttle_id)
+                            self.shuttles_id_to_storage_station.pop(0)
+                            self.shuttles_waiting_for_storage.append(shuttle_id)
+                            break
+                # goal = [0.12, 0.84, 0.0, 0.0, 0.0, 0.0]
+                # self.send_goal_for_shuttles(goal, shuttle_id)
+                # self.shuttles_id_to_storage_station.pop(0)
+                # self.shuttles_waiting_for_storage.append(shuttle_id)
         # 5. If no more tasks move to random position
         if self.task_planner.get_tasks() == None:
             if active_tasks == None:
                 self.is_finished = True
-    
+        
     def update_states(self):
         # self.get_logger().info(f'old number of manipulators {self.old_number_of_manipulators}')
         # self.get_logger().info(f'number of manipulators {self.number_of_manipulators}')
@@ -290,7 +309,7 @@ class TaskPlanner(Node):
             #self.get_logger().info(f'shuttle joint state {msg}')
             #self.get_logger().info(f'shuttle joint state {msg.name}')
             idx = int(msg.name[0])
-        # self.get_logger().info(f'shuttle joint state idx {idx}')
+        # self.get_logger().info(f'shuttle joint state idx {idx}')s
             x, y = msg.position[0], msg.position[1]
             position = np.array([x, y])
             #self.get_logger().info(f'all shuttles {self.task_planner.shuttles.get_shuttles()}')
@@ -367,6 +386,11 @@ class TaskPlanner(Node):
                 if result.id == shuttle_id:
                     self.shuttles_waiting_for_storage.pop(idx)
                     self.task_planner.free_shuttle(self.task_planner.shuttles.get_shuttle_by_index(shuttle_id))
+                    hand_over_station = self.task_planner.hand_over_stations.get_by_assigned_shuttle_id(shuttle_id)
+                    if not hand_over_station is None:
+                        self.task_planner.free_station(hand_over_station)
+                        self.task_planner.free_hand_over_station(hand_over_station)
+
                     self.get_logger().info(f'shuttle {shuttle_id} is free')
 
 def main(args=None):

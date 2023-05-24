@@ -16,6 +16,8 @@ class Station():
     """Class for a single station"""
     def __init__(self) -> None:
         self.available = True
+        self.position = np.array([0,0])
+        self.assigned_shuttle_id = None
 
     def get_position(self):
         return self.position
@@ -31,6 +33,12 @@ class Station():
     
     def set_availibility(self, available: bool):
         self.available = available
+
+    def get_assigned_shuttle_id(self):
+        return self.assigned_shuttle_id
+    
+    def set_assigned_shuttle_id(self, shuttle_id: int):
+        self.assigned_shuttle_id = shuttle_id
 
 
 class Shuttle():
@@ -113,6 +121,12 @@ class StationManager():
     def set_status(self, station: Station, status: bool):
         station.set_availibility(status)
 
+    def get_by_assigned_shuttle_id(self, shuttle_id: int) -> Station:
+        for station in self.stations:
+            if station.get_assigned_shuttle_id() == shuttle_id:
+                return station
+        return None
+
 class TaskManager():
     """Class for keeping track of the tasks"""
     def __init__(self) -> None:
@@ -127,6 +141,8 @@ class TaskManager():
 
     def get_tasks(self):
         return self.tasks
+
+
 
 class ShuttleManager():
     """Class for keeping track of the shuttles"""
@@ -156,7 +172,7 @@ class ShuttleManager():
 class TaskPlannerUtils():
     """ Node for planning and orchestrating tasks for the manipulators and shuttles"""
     def __init__(self) -> None:
-
+        self.hand_over_stations = StationManager()
 
     
 
@@ -333,6 +349,10 @@ class TaskPlannerUtils():
     def free_shuttle(self, shuttle: Shuttle):
         """Function to free a shuttle"""
         self.shuttles.set_status(shuttle, True)
+
+    def free_hand_over_station(self, station: Station):
+        """Function to free a hand over station"""
+        self.hand_over_stations.set_status(station, True)
     
 import random
 def create_fake_tasks():
